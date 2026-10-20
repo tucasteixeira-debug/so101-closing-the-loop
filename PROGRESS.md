@@ -10,6 +10,41 @@ The project started from zero in most of these areas. The Formation lists record
 
 ---
 
+### 2026-10-14 to 2026-10-20 · Assembly, calibration and first teleoperation of the SO-101 pair
+
+**Achieved**
+
+> [!IMPORTANT]
+> **Milestones**
+> - **First teleoperation of the SO-101 pair**: the follower copies the hand-guided leader on all 6 joints at 59.1 Hz (target 60 Hz), 0 of 4769 control ticks over budget.
+> - **Both arms assembled and calibrated**, 6/6 joints each.
+
+- Same bus fault on both arms: servos beyond ID 2 did not answer, which placed the break in the servo 2 → 3 cable; a broken connector pin was re-soldered.
+
+<p align="center">
+  <img src="docs/media/so101_first_teleop.gif" width="260" alt="Follower arm copying the motion of the hand-guided leader arm">
+  <br>
+  <em><b>Figure 1.</b> First teleoperation on hardware: the follower copies the hand-guided leader joint by joint, 60 Hz loop, 5° per-tick safety cap. Phone video, 11.4 s.</em>
+</p>
+
+<p align="center">
+  <img src="docs/media/so101_pair_assembled_front.jpg" width="360" alt="Assembled SO-101 leader and follower arms clamped to a desk edge">
+  <br>
+  <em><b>Figure 2.</b> Assembled leader (front) and follower, clamped about 10 cm apart in the same orientation.</em>
+</p>
+
+**Formation — questions worked through**
+- Why must a joint's travel never cross the encoder's 4095 → 0 wrap, and how does calibration prevent it? The servo computes error = goal − present on a straight number line, so a 1.4° move from 4090 to 10 reads as −4080 counts ≈ −358°. Calibration sets a homing offset, reported = (raw − offset) mod 4096, with offset = raw − 2047 at the pose the arm is held in, so that pose sits opposite the wrap (raw 4038 → offset 1991). The margin left on each side is (4096 − travel)/2: 855 counts ≈ ±75° for shoulder_lift.
+- How do two arms with different raw counts agree on "the same position"? Each arm's calibration maps counts to degrees, with 0° = (min + max)/2 of the recorded travel and degrees = (count − mid) · 360/4095; degrees are what is sent. Example: leader 1490 → −45.3° → follower 1442.
+- Why does a position servo trail a moving target? Its torque is proportional to the position error, so following at speed ω needs an error that grows with ω. Measured on one fast wrist move (preliminary): 5–6° behind at ≈ 50°/s, a lag of ≈ 0.11 s, of which communication is ≲ 20 ms.
+- Does a learned imitation policy need inverse kinematics? No: the human solves it by moving the leader. A scripted inverse-kinematics grasp does, and its spread contains only mechanical and control error, so comparing it with the policy isolates the policy's share.
+
+**Not achieved / open**
+- No commanded-vs-measured data on the real follower yet.
+- Re-soldered pins sit on the most-moved shoulder cable of both arms, a reliability risk.
+
+---
+
 ### 2026-10-12 to 2026-10-13 · Forward kinematics of the SO-101
 
 **Achieved**
