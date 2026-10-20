@@ -10,6 +10,28 @@ The project started from zero in most of these areas. The Formation lists record
 
 ---
 
+### 2026-10-12 to 2026-10-13 · Forward kinematics of the SO-101
+
+**Achieved**
+
+> [!IMPORTANT]
+> **Milestones**
+> - **First forward-kinematics model of the real SO-101**: the planar chain shoulder_lift → elbow_flex → wrist_flex predicts the gripper position of the MuJoCo model on 10 random poses with a max error of 3 × 10⁻¹³ mm.
+
+- Method: joint positions and axes read from the MuJoCo model give the arm's real geometry: link lengths 0.1160 / 0.1350 / 0.1594 m and the angle of each link at zero encoder reading (+76.03°, −73.82°, −5.05°). Derived by hand; the comparison script was AI-written.
+- n-joint forward kinematics written in NumPy: a cumulative sum turns relative joint angles into link directions, then one matrix product [cos φ; sin φ] (2 × n) · L (n) gives the tip (x, y). Checked on two hand-solved poses, both (0.10, 0.10) m.
+
+**Formation — questions worked through**
+- How does the tip position follow from the joint angles? Each encoder measures its link relative to the previous one, so link k points along the running sum of angles: x = Σ Lₖ cos(θ₁ + … + θₖ), y = Σ Lₖ sin(θ₁ + … + θₖ).
+- Why can one target have two joint solutions? The elbow lies on a circle of radius L₁ around the base and of radius L₂ around the target; two circles meet in 2, 1 or 0 points (elbow-up, elbow-down, or unreachable).
+- Why is full stretch the worst place for a task? For two equal links, |tip|² = 2L² + 2L² cos φ₂ = 4L² cos²(φ₂/2), so r = 2L cos(φ₂/2) and dr/dφ₂ = −L sin(φ₂/2). With L = 0.10 m: 1.23 mm of radial motion per elbow degree at 90° bend, 0.03 mm at 2°. Near the stretched pose (a singularity) the tip barely responds to the joints.
+- Why does kinematics follow the line between joint axes, not the shape of the part? On the SO-101 the elbow axis sits 2.8 cm to the side of the upper arm, which tilts the effective link by 14°; ignoring it misplaces the elbow by about 2.8 cm.
+
+**Not achieved / open**
+- Full 3D kinematics (adding shoulder_pan and wrist_roll) not started.
+
+---
+
 ### 2026-10-06 to 2026-10-07 · First simulations: single-joint dynamics and a 6-joint pose sequence
 
 **Achieved**
