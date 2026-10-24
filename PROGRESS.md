@@ -1,12 +1,18 @@
 # Progress Log
 
-A dated record of the project, newest first. Each entry covers one session or a span of sessions and lists, in plain terms:
+A dated record of my project, newest first. Each entry covers one session or a span of sessions and lists, in plain terms:
 
 - **Achieved**: concrete, verifiable outcomes, quantified where possible.
-- **Formation**: the questions worked through, across the full stack the project rests on. That includes computing and operating systems, communication, electronics, mechanics, kinematics, control, measurement and statistics, perception, and machine learning.
+- **Formation**: the questions I worked through, across the full stack the project rests on. That includes computing and operating systems, communication, electronics, mechanics, kinematics, control, measurement and statistics, perception, and machine learning.
 - **Not achieved / open**: what didn't work, what is blocked, and what remains.
 
-The project started from zero in most of these areas. The Formation lists record what was studied; they are not a claim of mastery. Entries are drafted with an AI-assisted workflow from private working notes, and each is reviewed by hand before it is committed.
+I started from zero in most of these areas. The Formation lists record what I studied; they are not a claim of mastery. I draft entries from my private working notes with an AI-assisted workflow and review each one by hand before committing it.
+
+## How I learn: method and references
+
+To develop academic-level thinking for this robot, I consult university robotics courses and use them as references for my exercises and study: Georgia Tech ECE 4560 (Maegan Tucker, a course built on the SO-101), MIT 6.4210 *Robotic Manipulation* (Russ Tedrake) and *Modern Robotics* (Kevin Lynch & Frank Park). I don't use them to copy a course. They give me guidance and set the level, so that I build an academic formation and can then solve problems and make a contribution on my own.
+
+In practice I work every step by hand first: derivations and sketches in my notebook, closed-book recall of the previous lesson, and an explanation of each step in my own words. Only then do I code it and check it against the simulator or the real arm, with real numbers. An AI tutor asks me questions, makes me explain my reasoning and checks my numbers. Each entry lists the sources it used under **Method and references**, and my published exercises are in [`sim/exercises/`](sim/exercises/).
 
 ---
 
@@ -16,10 +22,10 @@ The project started from zero in most of these areas. The Formation lists record
 
 > [!IMPORTANT]
 > **Milestones**
-> - **First teleoperation of the SO-101 pair**: the follower copies the hand-guided leader on all 6 joints at 59.1 Hz (target 60 Hz), 0 of 4769 control ticks over budget.
-> - **Both arms assembled and calibrated**, 6/6 joints each.
+> - **First teleoperation of my SO-101 pair**: the follower copies the hand-guided leader on all 6 joints at 59.1 Hz (target 60 Hz), 0 of 4769 control ticks over budget.
+> - **I assembled and calibrated both arms**, 6/6 joints each.
 
-- Same bus fault on both arms: servos beyond ID 2 did not answer, which placed the break in the servo 2 → 3 cable; a broken connector pin was re-soldered.
+- I found the same bus fault on both arms: servos beyond ID 2 did not answer, which placed the break in the servo 2 → 3 cable. I re-soldered a broken connector pin.
 
 <p align="center">
   <img src="docs/media/so101_first_teleop.gif" width="260" alt="Follower arm copying the motion of the hand-guided leader arm">
@@ -40,8 +46,8 @@ The project started from zero in most of these areas. The Formation lists record
 - Does a learned imitation policy need inverse kinematics? No: the human solves it by moving the leader. A scripted inverse-kinematics grasp does, and its spread contains only mechanical and control error, so comparing it with the policy isolates the policy's share.
 
 **Not achieved / open**
-- No commanded-vs-measured data on the real follower yet.
-- Re-soldered pins sit on the most-moved shoulder cable of both arms, a reliability risk.
+- I have no commanded-vs-measured data on the real follower yet.
+- The re-soldered pins sit on the most-moved shoulder cable of both arms, a reliability risk.
 
 ---
 
@@ -51,10 +57,10 @@ The project started from zero in most of these areas. The Formation lists record
 
 > [!IMPORTANT]
 > **Milestones**
-> - **First forward-kinematics model of the real SO-101**: the planar chain shoulder_lift → elbow_flex → wrist_flex predicts the gripper position of the MuJoCo model on 10 random poses with a max error of 3 × 10⁻¹³ mm.
+> - **My first forward-kinematics model of the real SO-101**: the planar chain shoulder_lift → elbow_flex → wrist_flex predicts the gripper position of the MuJoCo model on 10 random poses with a max error of 3 × 10⁻¹³ mm.
 
-- Method: joint positions and axes read from the MuJoCo model give the arm's real geometry: link lengths 0.1160 / 0.1350 / 0.1594 m and the angle of each link at zero encoder reading (+76.03°, −73.82°, −5.05°). Derived by hand; the comparison script was AI-written.
-- n-joint forward kinematics written in NumPy: a cumulative sum turns relative joint angles into link directions, then one matrix product [cos φ; sin φ] (2 × n) · L (n) gives the tip (x, y). Checked on two hand-solved poses, both (0.10, 0.10) m.
+- Method: I read the joint positions and axes from the MuJoCo model to get the arm's real geometry: link lengths 0.1160 / 0.1350 / 0.1594 m and the angle of each link at zero encoder reading (+76.03°, −73.82°, −5.05°). I derived the model by hand; the comparison script was written by AI.
+- I wrote n-joint forward kinematics in NumPy: a cumulative sum turns relative joint angles into link directions, then one matrix product [cos φ; sin φ] (2 × n) · L (n) gives the tip (x, y). I checked it on two hand-solved poses, both (0.10, 0.10) m.
 
 **Formation — questions worked through**
 - How does the tip position follow from the joint angles? Each encoder measures its link relative to the previous one, so link k points along the running sum of angles: x = Σ Lₖ cos(θ₁ + … + θₖ), y = Σ Lₖ sin(θ₁ + … + θₖ).
@@ -63,7 +69,7 @@ The project started from zero in most of these areas. The Formation lists record
 - Why does kinematics follow the line between joint axes, not the shape of the part? On the SO-101 the elbow axis sits 2.8 cm to the side of the upper arm, which tilts the effective link by 14°; ignoring it misplaces the elbow by about 2.8 cm.
 
 **Not achieved / open**
-- Full 3D kinematics (adding shoulder_pan and wrist_roll) not started.
+- I had not started full 3D kinematics (adding shoulder_pan and wrist_roll).
 
 ---
 
@@ -73,14 +79,14 @@ The project started from zero in most of these areas. The Formation lists record
 
 > [!IMPORTANT]
 > **Milestones**
-> - **First simulation commanding all 6 SO-101 joints together**, recorded and plotted per joint (commanded vs. actual).
+> - **My first simulation commanding all 6 SO-101 joints together**, recorded and plotted per joint (commanded vs. actual).
 > - **First choreographed motion:** 7 poses (ready, reach, grasp, lift with wrist roll, reach, release, home), no floor contact, largest arm-joint tracking gap 0.013 rad.
 
-- First hand-written simulation model: a one-joint pendulum stepped from Python (simulated swing period ≈ 1.2 s).
-- SO-101 model inspected from Python: 8 bodies, 6 joints, 6 position actuators, 31 geometry elements.
+- My first hand-written simulation model: a one-joint pendulum stepped from Python (simulated swing period ≈ 1.2 s).
+- I inspected the SO-101 model from Python: 8 bodies, 6 joints, 6 position actuators, 31 geometry elements.
 - Simulated 0.5 rad step on one joint: overshoot to 0.627 rad, settled by ≈ 0.43 s, 0.0007 rad residual offset.
 - Tracking error vs. move duration (0.5 rad move): largest gap 0.0047, 0.023, 0.33 rad at 2.0, 0.5, 0.1 s.
-- Simulation only; motor parameters are borrowed from another robot model, so control error must come from the real arm.
+- These are simulation results only. The motor parameters are borrowed from another robot model, so the control error has to come from the real arm.
 
 <p align="center">
   <img src="docs/media/ex4_pose_sequence.gif" width="480" alt="Simulation of the public SO-101 model moving all 6 joints through a 7-pose sequence">
@@ -106,20 +112,20 @@ The project started from zero in most of these areas. The Formation lists record
 - How are simulation frames rendered offscreen and compressed for documentation? (fixed camera, GIF export, cropping, frame skipping, palette reduction)
 
 **Not achieved / open**
-- No hardware progress: follower not assembled, leader IDs still unverified.
-- Forward kinematics not started.
+- No hardware progress: I had not assembled the follower, and the leader IDs were still unverified.
+- I had not started forward kinematics.
 
 ---
 
 ### 2026-09-25 to 2026-09-26 · Leader-arm configuration and preparation of the simulation track
 
 **Achieved**
-- Leader arm: 6/6 servos matched to joints by gear ratio, checked against the official bill of materials.
-- Leader IDs 1–6 assigned with the single working board; not yet confirmed by a bus scan.
-- Earlier "leader blocked" status corrected: ID assignment needs one board; two are needed only for teleoperation.
-- Public SO-101 simulation model loaded in MuJoCo 3.14 in a test environment; joint names and order match LeRobot.
-- Tip shift per encoder step (0.088°) computed from the model: 0.25–0.54 mm, depending on joint and pose.
-- Stock gripper collision shapes found unable to hold a cube in simulation.
+- Leader arm: I matched 6/6 servos to their joints by gear ratio and checked them against the official bill of materials.
+- I assigned leader IDs 1–6 with the single working board; not yet confirmed by a bus scan.
+- I corrected my earlier "leader blocked" status: ID assignment needs one board; two are needed only for teleoperation.
+- I loaded the public SO-101 simulation model in MuJoCo 3.14 in a test environment; joint names and order match LeRobot.
+- I computed the tip shift per encoder step (0.088°) from the model: 0.25–0.54 mm, depending on joint and pose.
+- I found that the stock gripper collision shapes cannot hold a cube in simulation.
 
 **Formation — questions worked through**
 - On a shared servo bus, which operations need one adapter, and which need two at once? (daisy-chain addressing, ID assignment vs. teleoperation)
@@ -131,26 +137,26 @@ The project started from zero in most of these areas. The Formation lists record
 - What happens when a command line runs a Python module? (shell search path, interpreter flags, argument passing, conda environments)
 - Through which software layers does one servo command travel? (Python packet builder, serial library, kernel driver, board and servo firmware)
 
-**References for the exercises**
-- Backbone: Georgia Tech ECE 4560 (Maegan Tucker), a course built on the SO-101; used as a reference, not followed step by step.
-- Deliberate differences: simulation first, forward kinematics and sensitivity before inverse kinematics, prediction vs. measurement in every exercise.
+**Method and references**
+- Backbone: Georgia Tech ECE 4560 (Maegan Tucker), a course built on the SO-101. I use it as a reference, not step by step.
+- Where I deliberately differ: simulation first, forward kinematics and sensitivity before inverse kinematics, and a prediction vs. measurement in every exercise.
 - Supplements: MIT 6.4210 *Robotic Manipulation*, Chapter 3; Northwestern *Modern Robotics* (Lynch & Park).
 - Simulation model: TheRobotStudio's public SO-101 MuJoCo model (SO-ARM100 repository).
 - Learning-design evidence: de Jong, Linn & Zacharia (2013), *Science*, on combining physical and virtual laboratories.
 
 **Not achieved / open**
-- Leader IDs not verified; a second driver board is still needed to run both arms together.
-- Physical assembly not started; deliberately deferred to avoid reassembly and recalibration.
+- Leader IDs not verified; I still needed a second driver board to run both arms together.
+- I had not started physical assembly; I deferred it deliberately to avoid reassembly and recalibration.
 
 ---
 
 ### 2026-09-23 to 2026-09-25 · Public repository, version control and documentation workflow
 
 **Achieved**
-- Public repository created with a documented structure: overview, progress log, and a README per folder.
-- Private working notes and tool configuration excluded from version control; exclusion verified before publishing.
-- Public objectives document written, including a researched overview of the current physical-AI landscape.
-- AI coding agent installed and configured with project instructions and an approval-gated routine for this log.
+- I created the public repository with a documented structure: overview, progress log, and a README per folder.
+- I excluded my private working notes and tool configuration from version control, and verified the exclusion before publishing.
+- I wrote the public objectives document, including a researched overview of the current physical-AI landscape.
+- I installed and configured an AI coding agent with project instructions and an approval-gated routine for this log.
 
 **Formation — questions worked through**
 - How does a Unix shell locate executables, and when do startup-file changes take effect? (search path, symbolic links, per-shell startup files)
@@ -161,20 +167,20 @@ The project started from zero in most of these areas. The Formation lists record
 - How does an AI coding agent act on a filesystem, and how is its authority bounded? (permission gating, standing instructions, skills)
 
 **Not achieved / open**
-- An early repository version included private notes in its history; the repository was rebuilt with a clean history.
+- An early version of the repository included my private notes in its history; I rebuilt the repository with a clean history.
 - The routine for drafting this log needed several redesigns before the first entry.
-- No hardware progress: leader arm still blocked; assembly not started.
-- Repository license not yet chosen.
+- No hardware progress: the leader arm was still blocked and assembly had not started.
+- I have not yet chosen a license for the repository.
 
 ---
 
 ### 2026-09-19 to 2026-09-23 · Hardware bring-up: servo configuration and the communication layer
 
 **Achieved**
-- Follower arm: 6/6 servos assigned unique bus IDs, configured one servo at a time.
-- Defective driver board isolated by substitution: 1 of 2 boards powered and enumerated but relayed no data.
-- Warranty claim filed for the defective board; a low-cost backup adapter identified.
-- Serial-port access configured persistently through group membership.
+- Follower arm: I assigned unique bus IDs to 6/6 servos, configuring one servo at a time.
+- I isolated a defective driver board by substitution: 1 of 2 boards powered and enumerated but relayed no data.
+- I filed a warranty claim for the defective board and identified a low-cost backup adapter.
+- I configured serial-port access persistently through group membership.
 
 **Formation — questions worked through**
 - How is a robotic manipulator decomposed into functional layers, and how do these map onto the error budget?
@@ -185,21 +191,21 @@ The project started from zero in most of these areas. The Formation lists record
 - How does a Unix shell resolve variables, programs and access rights? (environment variables, search path, permissions, groups)
 
 **Not achieved / open**
-- Leader arm not configured; blocked on a second working driver board.
-- A hand-written diagnostic script briefly mimicked a hardware fault; the cause was a silently caught software error.
-- Physical assembly and calibration not started.
+- The leader arm was not configured; it was blocked on a second working driver board.
+- A diagnostic script I wrote briefly mimicked a hardware fault; the cause was a silently caught software error.
+- I had not started physical assembly and calibration.
 
 ---
 
 ### 2026-09-12 · Project planning and development environment setup
 
 **Achieved**
-- Semester time budget estimated against course load; single-semester completion kept as a stretch goal.
-- Working method set: concepts built one at a time from physical intuition, alongside hands-on work.
-- Camera setup revised to two cameras (wrist-mounted and overview); hardware kit sourced.
-- Ubuntu 24.04 LTS installed as dual-boot, with NVIDIA GPU drivers for later policy training.
-- LeRobot installed with Feetech servo support in a dedicated Python 3.12 environment; import verified.
-- Development tooling installed: version control, code editor, Python package manager.
+- I estimated a semester time budget against my course load; single-semester completion is a stretch goal.
+- I set my working method: concepts built one at a time from physical intuition, alongside hands-on work.
+- I revised the camera setup to two cameras (wrist-mounted and overview) and sourced the hardware kit.
+- I installed Ubuntu 24.04 LTS as dual-boot, with NVIDIA GPU drivers for later policy training.
+- I installed LeRobot with Feetech servo support in a dedicated Python 3.12 environment and verified the import.
+- I installed my development tooling: version control, code editor, Python package manager.
 
 **Formation — questions worked through**
 - Where does the boundary between hardware and software lie? (transistors as switches, bits, memory from feedback latches)
@@ -210,6 +216,6 @@ The project started from zero in most of these areas. The Formation lists record
 - How are Python dependencies isolated per project? (conda environments, interpreter version requirements)
 
 **Not achieved / open**
-- First LeRobot install failed: third-party guides specify Python 3.10, while current LeRobot requires 3.12 or newer.
-- Measurement method (camera fiducials vs. mechanical fixture) not yet evaluated.
-- Task geometry and policy choice not yet fixed.
+- My first LeRobot install failed: third-party guides specify Python 3.10, while current LeRobot requires 3.12 or newer.
+- I had not yet evaluated the measurement method (camera fiducials vs. mechanical fixture).
+- I had not yet fixed the task geometry or the choice of policy.
