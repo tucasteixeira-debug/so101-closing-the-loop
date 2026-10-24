@@ -16,6 +16,34 @@ In practice I work every step by hand first: derivations and sketches in my note
 
 ---
 
+### 2026-10-20 to 2026-10-24 · Full 3D forward kinematics of the SO-101, validated against MuJoCo
+
+**Method and references**
+- My exercises and study follow reference robotics courses. They give me guidance and set the academic level of thinking I aim for on this robot: K. Lynch & F. Park, *Modern Robotics* (2017), §4.1.1 (product of exponentials); Georgia Tech ECE 4560 (Fall 2025), lectures 2–4 (rotations and transforms); R. Tedrake, *Robotic Manipulation* (MIT), Ch. 3.
+- I work every step by hand first: derivations and sketches in my notebook, closed-book recall of the previous lesson, and an explanation of each step in my own words. Only then do I code it. An AI tutor asks me questions, makes me explain my reasoning and checks my numbers.
+- Each result is then checked against the official SO-101 model in MuJoCo, using real numbers.
+
+**Achieved**
+
+> [!IMPORTANT]
+> **Milestones**
+> - **First full 3D forward kinematics of the SO-101 (5 joints, base to gripper), validated against MuJoCo**: maximum position error 1.3 × 10⁻¹² mm over 20 random poses within the joint limits, i.e. floating-point level (position only; orientation not yet compared).
+
+- Code: [`ex5_so101_fk3d.py`](sim/exercises/lesson_B/ex5_so101_fk3d.py). I wrote it, thought it through and designed its structure: rotation functions with a sign per joint, one 4×4 transform per joint, a running product from the base outward, and a comparison with MuJoCo. AI helped me find errors and helped with some vocabulary and code, and it asked me questions that made me explain each part. I tested it in increasing difficulty: zero pose, pan only, one joint at a time, then 20 random poses.
+- I diagnosed and fixed a teleoperation fault: after re-plugging, the follower went limp while the leader moved by itself. Linux numbers serial ports in plug order, so the two boards had swapped names and the leader was receiving the motion commands. I isolated the cause by connecting one board at a time.
+
+**Formation — questions worked through**
+- Where do the rotation matrices come from? Write a point as (x, y) = |r|(cos φ₀, sin φ₀) and rotate it by α. Expanding cos(φ₀ + α) and sin(φ₀ + α) with the addition formulas gives x′ = x cos α − y sin α, y′ = x sin α + y cos α, which is R_z. Each column shows where an axis lands (at 90°, R_z sends x → y). The cyclic order x → y → z → x then gives R_x and R_y, with R_y's minus sign in the bottom-left. The columns are orthonormal (Rᵀ R = I, det = +1), so lengths are preserved.
+- How does a joint's axis direction fix the sign of its angle? A rotation by θ about −axis equals a rotation by −θ about +axis. From the model's axis vectors: pan (0, 0, −1) → R_z(−θ), lift/elbow/wrist_flex (0, 1, 0) → R_y(+θ), wrist_roll (−1, 0, 0) → R_x(−θ), each checked in MuJoCo. A wrong sign mirrors the arm: the tip lands at y = +0.1763 m instead of −0.1763 m at pan 30°, 35 cm apart.
+- Why does a joint need a 4×4 transform rather than a 3×3 matrix? R turns vectors about the origin only, so a point is turned about an axis through c as p′ = c + R(p − c). For the elbow axis point at pan 30° this gives (0.0802, −0.0450) m, matching MuJoCo, while R·p alone lands 2 cm off. Rewritten, p′ = R p + t with t = c − R c, and a constant shift cannot come from a matrix product (R·0 = 0). Appending a 1 to the point puts t in a fourth column: T = [R t; 0 1].
+- How does the tip follow from the rotation of every joint about its own axis? tip(θ) = T_pan(θ₁) T_lift(θ₂) T_elbow(θ₃) T_wflex(θ₄) T_roll(θ₅) [p₀; 1], where p₀ is the tip at the zero pose. The matrices act right to left, so the joint nearest the tip turns first while every joint nearer the base is still at zero. Each axis point c therefore keeps its zero-pose value, read once from the model, and moving the arm means calling the same function with new angles. The product turns each joint's shift by the joints nearer the base (combined shift R_pan t_lift + t_pan). Multiplied in the reverse order, the elbow point at pan 30° + lift 30° is 29 mm off. Formal name: product of exponentials, space form.
+
+**Not achieved / open**
+- The orientation half of the validation is not done: I have not yet compared the gripper's rotation with MuJoCo's.
+- The serial ports still have no stable per-device names, which is what allowed the teleoperation fault.
+
+---
+
 ### 2026-10-14 to 2026-10-20 · Assembly, calibration and first teleoperation of the SO-101 pair
 
 **Achieved**

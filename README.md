@@ -19,6 +19,7 @@ It uses ground-truth measurements taken independently of the arm's own sensors. 
 | [`docs/`](docs/) | Background and objectives, plus methodology and results write-ups later |
 | [`hardware/`](hardware/) | The physical platform: parts, bring-up status, and the measurement rig once it's designed |
 | [`src/`](src/) | Code written for this project (measurement, analysis, experiment scripts) |
+| [`sim/`](sim/) | Simulation of the SO-101 in MuJoCo, and my published study exercises |
 | [`experiments/`](experiments/) | One folder per experimental condition, each with its protocol, results and analysis |
 
 Every folder has its own README explaining what goes in it and what state it's in.
