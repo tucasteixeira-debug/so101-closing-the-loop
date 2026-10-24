@@ -19,17 +19,23 @@ Total platform cost: about $343, including the frame and one camera.
 
 | Step | Status |
 |---|---|
-| Follower arm motor IDs | ✅ Done: IDs 1–6 assigned |
-| Leader arm motor IDs | ⏳ Blocked: waiting on a second working driver board |
-| Mechanical assembly | Not started |
-| Calibration (`lerobot-calibrate`) | Not started |
+| Follower arm motor IDs | ✅ Done: IDs 1–6 assigned (2026-09) |
+| Leader arm motor IDs | ✅ Done: IDs 1–6, matched to joints by gear ratio (2026-09) |
+| Mechanical assembly | ✅ Done: both arms (2026-10) |
+| Calibration (`lerobot-calibrate`) | ✅ Done: both arms, 6/6 joints each (2026-10) |
+| Teleoperation | ✅ Working: follower copies the leader at 59.1 Hz (target 60 Hz) |
+| Stable port names (`/dev/serial/by-id/`) | Not yet set up |
+| Independent measurement rig | Not yet designed |
+
+Details and dates are in [`PROGRESS.md`](../PROGRESS.md).
 
 ## Notes worth knowing if you're building one
 
 - **A lit power LED does not prove a driver board works.** Power delivery and USB-to-bus data relay are separate circuits, and one can fail while the other works. Test any new board with one known-good servo before trusting it.
 - **Label each servo the moment its ID is written.** The follower's six servos are physically identical, and the ID is invisible once written.
 - **The leader arm's servos are not interchangeable.** They use three different gear ratios across the joints (1/191, 1/345, 1/147).
-- **`/dev/ttyACM#` numbering changes across reconnects.** Re-run `lerobot-find-port` rather than assuming a fixed port.
+- **`/dev/ttyACM#` numbering changes across reconnects.** Re-run `lerobot-find-port` rather than assuming a fixed port. With the ports swapped, teleoperation drives the leader and leaves the follower limp.
+- **If servos beyond a certain ID stop answering, suspect the cable after the last one that answers.** On both of my arms, a connector pin in the servo 2 → 3 cable had broken and had to be re-soldered.
 
 ## Planned
 

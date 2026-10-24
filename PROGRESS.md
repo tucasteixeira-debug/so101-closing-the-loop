@@ -14,6 +14,19 @@ To develop academic-level thinking for this robot, I consult university robotics
 
 In practice I work every step by hand first: derivations and sketches in my notebook, closed-book recall of the previous lesson, and an explanation of each step in my own words. Only then do I code it and check it against the simulator or the real arm, with real numbers. An AI tutor asks me questions, makes me explain my reasoning and checks my numbers. Each entry lists the sources it used under **Method and references**, and my published exercises are in [`sim/exercises/`](sim/exercises/).
 
+## Entries
+
+| Dates | Entry |
+|---|---|
+| [2026-10-20 to 2026-10-24](#2026-10-20-to-2026-10-24--full-3d-forward-kinematics-of-the-so-101-validated-against-mujoco) | Full 3D forward kinematics of the SO-101, validated against MuJoCo |
+| [2026-10-14 to 2026-10-20](#2026-10-14-to-2026-10-20--assembly-calibration-and-first-teleoperation-of-the-so-101-pair) | Assembly, calibration and first teleoperation of the SO-101 pair |
+| [2026-10-12 to 2026-10-13](#2026-10-12-to-2026-10-13--forward-kinematics-of-the-so-101) | Forward kinematics of the SO-101 |
+| [2026-10-06 to 2026-10-07](#2026-10-06-to-2026-10-07--first-simulations-single-joint-dynamics-and-a-6-joint-pose-sequence) | First simulations: single-joint dynamics and a 6-joint pose sequence |
+| [2026-09-25 to 2026-09-26](#2026-09-25-to-2026-09-26--leader-arm-configuration-and-preparation-of-the-simulation-track) | Leader-arm configuration and preparation of the simulation track |
+| [2026-09-23 to 2026-09-25](#2026-09-23-to-2026-09-25--public-repository-version-control-and-documentation-workflow) | Public repository, version control and documentation workflow |
+| [2026-09-19 to 2026-09-23](#2026-09-19-to-2026-09-23--hardware-bring-up-servo-configuration-and-the-communication-layer) | Hardware bring-up: servo configuration and the communication layer |
+| [2026-09-12](#2026-09-12--project-planning-and-development-environment-setup) | Project planning and development environment setup |
+
 ---
 
 ### 2026-10-20 to 2026-10-24 · Full 3D forward kinematics of the SO-101, validated against MuJoCo
@@ -147,6 +160,13 @@ In practice I work every step by hand first: derivations and sketches in my note
 
 ### 2026-09-25 to 2026-09-26 · Leader-arm configuration and preparation of the simulation track
 
+**Method and references**
+- Backbone: Georgia Tech ECE 4560 (Maegan Tucker), a course built on the SO-101. I use it as a reference, not step by step.
+- Where I deliberately differ: simulation first, forward kinematics and sensitivity before inverse kinematics, and a prediction vs. measurement in every exercise.
+- Supplements: MIT 6.4210 *Robotic Manipulation*, Chapter 3; Northwestern *Modern Robotics* (Lynch & Park).
+- Simulation model: TheRobotStudio's public SO-101 MuJoCo model (SO-ARM100 repository).
+- Learning-design evidence: de Jong, Linn & Zacharia (2013), *Science*, on combining physical and virtual laboratories.
+
 **Achieved**
 - Leader arm: I matched 6/6 servos to their joints by gear ratio and checked them against the official bill of materials.
 - I assigned leader IDs 1–6 with the single working board; not yet confirmed by a bus scan.
@@ -164,13 +184,6 @@ In practice I work every step by hand first: derivations and sketches in my note
 - How can control logic be shared between a simulated and a physical arm? (adapter layer, radians vs. degrees, simulated vs. real time)
 - What happens when a command line runs a Python module? (shell search path, interpreter flags, argument passing, conda environments)
 - Through which software layers does one servo command travel? (Python packet builder, serial library, kernel driver, board and servo firmware)
-
-**Method and references**
-- Backbone: Georgia Tech ECE 4560 (Maegan Tucker), a course built on the SO-101. I use it as a reference, not step by step.
-- Where I deliberately differ: simulation first, forward kinematics and sensitivity before inverse kinematics, and a prediction vs. measurement in every exercise.
-- Supplements: MIT 6.4210 *Robotic Manipulation*, Chapter 3; Northwestern *Modern Robotics* (Lynch & Park).
-- Simulation model: TheRobotStudio's public SO-101 MuJoCo model (SO-ARM100 repository).
-- Learning-design evidence: de Jong, Linn & Zacharia (2013), *Science*, on combining physical and virtual laboratories.
 
 **Not achieved / open**
 - Leader IDs not verified; I still needed a second driver board to run both arms together.

@@ -4,11 +4,12 @@ Written material about the project, as opposed to code, hardware files or raw re
 
 | File | Contents |
 |---|---|
-| [`about.md`](about.md) | Objectives, motivation, and starting point |
+| [`about.md`](about.md) | Objectives, motivation, prior work and the gap it leaves, and my starting point |
+| [`media/`](media/) | Photos, GIFs and figures used in [`PROGRESS.md`](../PROGRESS.md) |
 
 ## Planned
 
 - `methodology.md`: measurement method, ISO 9283-style statistics, and the error-budget logic. Written once the measurement rig is decided.
-- `results.md`: the final error-budget write-up.
+- `error-budget-report.md`: the error-budget report itself. Its planned outline is in the [main README](../README.md#the-error-budget-report).
 
 Files are added when there is real content for them, not as empty placeholders.
