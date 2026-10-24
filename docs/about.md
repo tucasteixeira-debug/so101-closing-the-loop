@@ -27,13 +27,26 @@ vary by several times over depending which analyst you ask, which says
 more about how unsettled the space still is than about its actual size.
 
 Separately from the market picture, there's a specific, concrete gap
-this project fills: the individual pieces it combines already exist on
-their own — servo-level backlash characterization, ISO 9283-style
-repeatability methodology, and a coarse benchmark of learned policies on
-this exact hardware (which found execution instability, not perception,
-is the dominant failure mode) — but nobody has yet combined them into
-one quantified error budget for this platform. That's a real, specific,
-citable hole, not a market claim.
+this project fills. The individual pieces it combines already exist on
+their own:
+
+- **ISO 9283-style repeatability of low-cost arms, with external ground
+  truth.** PyRobot's test of the LoCoBot arm [1] measured 0.33–0.58 mm
+  per pose with motion capture (10 cycles per pose), and HELENE [2], a
+  3D-printed six-axis arm, measured 0.87 mm on a coordinate measuring
+  machine. Neither splits the error into its sources.
+- **Servo-level backlash of the STS3215**, the SO-101's own servo. An
+  open-source test stand [3] measured 0.62° unloaded and 1.30° under a
+  load of about 0.3 kgf.
+- **A benchmark of learned policies on the SO-101** [4]. Most failed
+  trials came from execution (unstable grasps, repetition loops) rather
+  than perception, but no hardware quantities were measured.
+
+Nobody has yet combined these into one quantified error budget for this
+platform. There isn't even a public repeatability figure for a stock
+SO-101: a question asking for one in the official hardware repository is
+unanswered [5]. That's a real, specific, citable hole, not a market
+claim.
 
 I want to build genuine ability to work in this space and with this
 technology — not stake out a specific lane within it yet, just get
@@ -81,3 +94,21 @@ above gets pulled in only once the project genuinely needs it, learned
 by doing rather than pre-studied. The measure of success isn't a flashy
 end result; it's whether the engineering underneath it — the debugging,
 the design choices, the honest dead ends — actually holds up.
+
+## References
+
+1. A. Murali et al., "PyRobot: An Open-source Robotics Framework for
+   Research and Benchmarking", arXiv:1906.08236, 2019, §4.2.
+   <https://arxiv.org/abs/1906.08236>
+2. Herbst, Suppelt, Schäfer, Chadda, Kupnik, "HELENE: Six-Axis
+   Accessible Open-Source 3D-Printed Robotic Arm for Research and
+   Education", *Hardware* 3(3):7, 2025. <https://www.mdpi.com/2813-6640/3/3/7>
+3. B. Kotov, "An open-source test stand for backlash measurement in
+   low-cost UART servo motors", *HardwareX* 26, e00767, 2026.
+   <https://doi.org/10.1016/j.ohx.2026.e00767>
+4. Y. Yu, X. Qiu, "Benchmarking Vision-Language-Action Models on SO-101:
+   Failure and Recovery Analysis", arXiv:2606.08881, 2026.
+   <https://arxiv.org/abs/2606.08881>
+5. TheRobotStudio/SO-ARM100, issue #181, "What positional repeatability
+   should I expect from a stock SO-ARM101".
+   <https://github.com/TheRobotStudio/SO-ARM100/issues/181>
