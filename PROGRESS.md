@@ -16,6 +16,8 @@ In practice I work every step by hand first: derivations and sketches in my note
 
 ## Entries
 
+> **2026-10-25:** project reframed from *error anatomy* to *closing the loop*: same measurements, now followed by a vision-based correction with before/after numbers. Earlier entries keep their original wording.
+
 | Dates | Entry |
 |---|---|
 | [2026-10-20 to 2026-10-24](#2026-10-20-to-2026-10-24--full-3d-forward-kinematics-of-the-so-101-validated-against-mujoco) | Full 3D forward kinematics of the SO-101, validated against MuJoCo |

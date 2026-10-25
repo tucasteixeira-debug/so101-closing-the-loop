@@ -12,8 +12,9 @@ One subfolder per experimental condition. Each will contain:
 |---|---|---|
 | `01-scripted-motion/` | Fixed, non-learned motion repeated N times | Mechanical + control repeatability |
 | `02-servo-backlash/` | Bench test of a single STS3215 servo | Backlash specifically |
-| `03-learned-policy/` | Trained policy repeated N times on the same task | The added, policy-induced variance |
+| `03-learned-policy/` | Trained policy repeated N times on the same task (stretch phase) | The added, policy-induced variance |
 | `04-intervention/` | Chosen once 01–03 show which source dominates | The improvement |
+| `05-closed-loop-correction/` | Vision-based correction from the measurement camera, same pose before and after | The before/after repeatability |
 
 ## Ground rule
 

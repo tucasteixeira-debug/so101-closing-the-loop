@@ -1,52 +1,104 @@
-# SO-101: Error Anatomy
+# SO-101: Closing the Loop
 
-Where does a learned robot policy's placement error actually come from?
+A €200 open-source arm misses its placement target by some fraction of a millimetre. This project measures that miss with an independent camera rig, dissects where it comes from (backlash and compliance in the joints, the servos' control, and, later, a learned policy), and then closes the loop: a vision-based correction built on the same rig, with the repeatability measured before and after. The error budget is the diagnosis; the correction is the fix.
 
-I'm building an **error budget** for the SO-101, a low-cost open-source 6-DOF arm (Feetech STS3215 servos, Hugging Face LeRobot). On a precision placement task, I split its imprecision into three contributions:
-- **mechanical**: backlash and compliance in the joints;
-- **control**: how the servos are tuned;
-- **policy**: the learned imitation policy (ACT) itself.
+**Jump to:** [What and why](#what-this-project-is-and-why) · [Objectives, status and timeline](#objectives-status-and-timeline) · [Method and references](#method-and-references) · [About me](#about-me-and-why-i-took-this-on) · [Where to find what](#where-to-find-what)
 
-Every result is measured with ground truth independent of the arm's own sensors, using ISO 9283-style repeatability statistics. Once I know the dominant source, I apply one targeted intervention and quantify the improvement.
+<img src="docs/media/so101_pair_assembled_front.jpg" alt="The SO-101 leader and follower arms, assembled" width="480">
 
-> **Status (2026-10-24):** both arms are assembled, calibrated and teleoperating. Full 3D forward kinematics is validated against the MuJoCo model. Next: the Jacobian, which maps joint errors to tip errors, and the independent measurement rig. No error-budget measurements yet.
+## What this project is, and why
 
-## Why I'm doing this
+The SO-101 is a 5-DOF arm with a gripper (six Feetech STS3215 servos), built by The Robot Studio and Hugging Face for the LeRobot framework. It has become the standard low-cost platform for learning robot manipulation, but I found no published figure for how precisely a stock one actually places an object. A question asking for that number in the official hardware repository is still unanswered.
 
-I'm a Robotics & Mechatronics master's student, and this project is how I train myself:
-- **Academic formation.** I study robotics at university level (kinematics, dynamics, control, measurement), using university courses as references (Georgia Tech ECE 4560, MIT *Robotic Manipulation*, *Modern Robotics*), and derive everything by hand before I code it. See [how I learn](PROGRESS.md#how-i-learn-method-and-references).
-- **Real skills.** Python, Linux, electronics, simulation, machine learning and vision, each pulled in when the build needs it.
-- **A contribution of my own.** The pieces exist separately in the literature (repeatability tests, servo backlash, policy benchmarks), but nobody has combined them into one quantified error budget for this arm. That is my twist. See [the gap](docs/about.md#why-this-project).
-- **Full-stack robotics.** From packets on the servo bus up to the learned policy.
-- **Working with AI agents, out of curiosity.** AI agents act as my tutor and reviewer: they ask me questions, make me explain, and catch errors. They also run parts of my workflow, such as drafting this log for my review.
+When the arm misses, the miss has several possible sources, and they call for different fixes:
+- **mechanical**: backlash and compliance in the joints and gearboxes;
+- **control**: how the servos are tuned (a stiff or soft position loop, a dead band);
+- **policy**: the learned imitation policy (ACT), if one is driving the arm.
 
-More on the motivation and my starting point: [`docs/about.md`](docs/about.md).
+An **error budget** splits the total miss into these shares, so that the fix targets the source that actually dominates. I found no published multi-source error budget for an arm in this class, and no closed-loop correction with before/after numbers. Doing both on the same rig is the contribution. More on the prior work and the gap: [`docs/about.md`](docs/about.md#why-this-project).
+
+## Objectives, status and timeline
+
+**Objectives**
+1. Measure the placement repeatability of the SO-101 with ground truth independent of the arm's own sensors.
+2. Decompose that miss into its mechanical and control shares (and, as a stretch phase, the policy's), predicted first and then measured.
+3. Close the loop: a vision-based correction driven by the same camera, with repeatability measured before and after.
+
+> **Status (2026-10-25):** both arms are assembled, calibrated and teleoperating. Full 3D forward kinematics is validated against the MuJoCo model. On 2026-10-25 the project was reframed from *error anatomy* to *closing the loop*: same measurements, now followed by a vision-based correction. **No repeatability has been measured yet.** The full dated record is in [`PROGRESS.md`](PROGRESS.md).
+
+**Timeline.** The project is split into gates. Each gate ends in a result that can be shown, so the project is complete up to whichever gate it reaches.
+
+| Gate | Target date | Result | Status |
+|---|---|---|---|
+| Groundwork | Sep–Oct 2026 | Arms assembled and calibrated; servo bus understood; forward kinematics validated in simulation | ✅ Done |
+| **G1 First measured miss** | Dec 2026 | Scripted motion to one pose, 30 cycles, measured by a camera rig; repeatability per ISO 9283, with a written prediction first | Next |
+| **G2 Anatomy** | Jan 2027 | Where the miss comes from: backlash, servo stiffness under load, per-joint sensitivity, quantisation; predicted vs measured budget | Planned |
+| **G3 Closing the loop** | Mar 2027 | Vision-based correction step; repeatability before and after on the same pose | Planned |
+| G4 Stretch | Apr 2027 on | A learned ACT policy as a further condition; a ROS 2 wrapper | Only if time remains |
+
+## Method and references
+
+**The approach.** I measure the same task under progressively more complex conditions:
+1. **Scripted motion** (no learning), which gives the raw mechanical + control repeatability.
+2. **A bench-level servo backlash test**, which isolates the mechanical share.
+3. **A trained policy**, which adds the policy's own variance on top. This is a stretch phase, run only if time remains after step 4.
+4. **Close the loop**: a vision-based correction using the measurement camera, repeatability measured before and after.
+
+If these error sources are roughly independent, their variances add, and each contribution can be estimated by subtraction. That independence is an assumption to check against the data, not something to take for granted.
+
+**Rules I hold myself to**
+- **Independent ground truth.** Precision is never judged with the arm's own encoders or cameras, only with a separate measurement rig.
+- **ISO 9283-style statistics.** Repeatability is reported as RP = l̄ + 3S over repeated cycles to the same pose.
+- **Predict before measuring.** Every measured number gets a written prediction first; the gap between them is part of the result.
+- **Simulation alongside hardware.** Each derivation is checked against the official SO-101 model in MuJoCo before it is trusted on the real arm.
+
+**How I learn it.** I use university courses as references: Georgia Tech ECE 4560 (a course built on the SO-101), MIT 6.4210 *Robotic Manipulation* and Lynch & Park's *Modern Robotics*. I derive every step by hand, then code it and check it. Details: [how I learn](PROGRESS.md#how-i-learn-method-and-references).
+
+**Key prior work** (full citations in [`docs/about.md`](docs/about.md#references)):
+- Repeatability of low-cost arms with external ground truth: PyRobot / LoCoBot (0.33–0.58 mm), HELENE (0.87 mm), a capstan-drive arm (0.29–0.59 mm). None splits the error into its sources.
+- Backlash of the STS3215 servo itself: 0.62° unloaded, 1.30° under about 0.3 kgf (Kotov, *HardwareX* 2026).
+- A benchmark of learned policies on the SO-101 that attributes most failures to execution, without measuring any hardware quantity (Yu & Qiu, arXiv:2606.08881).
+
+## About me, and why I took this on
+
+I'm a master's student in Mechanical Engineering (Robotics & Mechatronics) at KU Leuven, after a bachelor's in Mechanical Engineering at IST Lisbon. Before this project I had worked on a pneumatic soft snake robot in a team of three, where I owned the electronics and the characterisation of its actuation delay. During an R&D internship at Siemens I built [describe2model](https://github.com/tucasteixeira-debug/describe2model), a framework that links control logic with physical models and validation data. Going in, I was close to zero in Linux, CAD, ROS 2 and machine learning.
+
+Why this project:
+- **Maturity.** I want to turn a promising background into demonstrated capability: one real engineering problem, owned end to end, with numbers that hold up.
+- **Skills, pulled in by necessity.** Python, Linux, the servo bus, electronics, kinematics, control, vision and machine learning, each learned when the build needs it, not studied in isolation beforehand.
+- **Learning by building.** Every concept is attempted, derived, coded and then checked against the simulator or the arm. The debugging and the dead ends are recorded as part of the work.
+- **Ownership.** I make and defend the engineering decisions myself (the measurement rig, the test protocol, the correction), under real constraints, and log them honestly, including what didn't work.
+- **Working with AI agents.** AI agents act as my tutor and reviewer: they ask me questions, make me explain, and catch errors. They also run parts of my workflow, such as drafting this log for my review.
+
+More on the motivation, the field and my starting point: [`docs/about.md`](docs/about.md).
 
 ## Where to find what
 
 | If you want… | Go to |
 |---|---|
-| What has actually been done, with numbers, figures and what I studied | [`PROGRESS.md`](PROGRESS.md), the dated log, newest first |
-| Why the project exists, the prior work it builds on, and my goals | [`docs/about.md`](docs/about.md) |
-| The error-budget report | [below](#the-error-budget-report); not written yet |
+| What has been done so far, with dates, numbers, figures and what I studied | [`PROGRESS.md`](PROGRESS.md), newest first |
+| The motivation, the prior work with full citations, and my goals | [`docs/about.md`](docs/about.md) |
+| The final report | [below](#the-report); not written yet |
 | My study exercises (derived by hand, coded, checked in simulation) | [`sim/exercises/`](sim/exercises/) |
-| The physical platform and its bring-up | [`hardware/`](hardware/) |
-| The experimental conditions and their results | [`experiments/`](experiments/) |
-| Code for measurement and analysis | [`src/`](src/) |
+| Simulation setup (MuJoCo, the official SO-101 model) | [`sim/`](sim/) |
+| The physical platform, its bring-up and the planned measurement rig | [`hardware/`](hardware/) |
+| The experimental conditions and, later, their results | [`experiments/`](experiments/) |
+| Code for the real arm, measurement and analysis | [`src/`](src/) |
+
+```
+.
+├── README.md          you are here
+├── PROGRESS.md        dated log: achieved, studied, still open
+├── docs/              about.md, figures in media/, the report later
+├── hardware/          platform, bring-up status, measurement rig
+├── sim/               MuJoCo setup and study exercises
+├── experiments/       one folder per condition (01–05)
+└── src/               project code
+```
 
 Every folder has its own README explaining what goes in it and what state it's in.
 
-## The approach, briefly
-
-I measure the same task under progressively more complex conditions:
-
-1. **Scripted motion** (no learning), which gives the raw mechanical + control repeatability
-2. **A bench-level servo backlash test**, which isolates the mechanical share
-3. **A trained policy**, which adds the policy's own variance on top
-
-If these error sources are roughly independent, their variances add, and each contribution can be estimated by subtraction. That independence is an assumption to check against the data, not something to take for granted.
-
-## The error-budget report
+## The report
 
 *Not written yet. This section is reserved for it.* The report will live in [`docs/`](docs/) and will be linked here once the measurements exist. Planned contents:
 
@@ -55,6 +107,7 @@ If these error sources are roughly independent, their variances add, and each co
 3. **Results per condition**: scripted motion, servo backlash, learned policy ([`experiments/01`–`03`](experiments/)).
 4. **The budget**: each source's share, with uncertainties.
 5. **The intervention**: what was changed and the measured improvement ([`experiments/04`](experiments/)).
+6. **Closing the loop**: the correction and its measured effect ([`experiments/05`](experiments/)).
 
 ## How this log is written
 

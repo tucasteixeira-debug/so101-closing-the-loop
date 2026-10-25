@@ -39,4 +39,4 @@ Details and dates are in [`PROGRESS.md`](../PROGRESS.md).
 
 ## Planned
 
-- `measurement-rig/`: the independent ground-truth rig. The leading option is a fixed camera with fiducial markers; a mechanical fixture is the fallback. CAD files and design notes go here once it's designed.
+- `measurement-rig/`: the independent ground-truth rig. The leading option is a fixed camera with fiducial markers; a mechanical fixture is the fallback. CAD files and design notes go here once it's designed. The rig will also be the sensor for the closed-loop correction, where the camera's measured residual drives a correction step (design session pending).

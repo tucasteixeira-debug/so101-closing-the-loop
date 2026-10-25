@@ -1,13 +1,22 @@
 # About This Project
 
+**SO-101: closing the loop.** A €200 open-source arm misses its placement
+target by some fraction of a millimetre. This project measures that miss
+with an independent camera rig, dissects where it comes from (backlash
+and compliance in the joints, the servos' control, and, later, a learned
+policy), and then closes the loop: a vision-based correction built on the
+same rig, with the repeatability measured before and after. The error
+budget is the diagnosis; the correction is the fix.
+
 ## The objective
 
-Characterize and improve the placement repeatability of the SO-101 6-DOF
-arm under a learned manipulation policy — measured independently of the
-arm's own sensors — and identify whether the dominant source of error is
-mechanical (backlash/compliance), control (servo tuning), or the learned
-policy itself. Apply one targeted intervention and quantify the
-improvement.
+Characterize and improve the placement repeatability of the SO-101, a
+5-DOF arm with a gripper (six STS3215 servos) — measured independently
+of the arm's own sensors — and identify whether the dominant source of
+error is mechanical (backlash/compliance), control (servo tuning), or,
+as a stretch phase, a learned policy. Then close the loop with a
+vision-based correction built on the measurement rig, and quantify the
+improvement before and after. No repeatability has been measured yet.
 
 ## Why this project
 
@@ -34,7 +43,10 @@ their own:
   truth.** PyRobot's test of the LoCoBot arm [1] measured 0.33–0.58 mm
   per pose with motion capture (10 cycles per pose), and HELENE [2], a
   3D-printed six-axis arm, measured 0.87 mm on a coordinate measuring
-  machine. Neither splits the error into its sources.
+  machine. A low-cost capstan-drive arm [6] measured 0.29–0.59 mm with a
+  dial indicator, rising with speed, and discussed backlash and
+  compliance only qualitatively. None of them splits the error into its
+  sources.
 - **Servo-level backlash of the STS3215**, the SO-101's own servo. An
   open-source test stand [3] measured 0.62° unloaded and 1.30° under a
   load of about 0.3 kgf.
@@ -42,10 +54,10 @@ their own:
   trials came from execution (unstable grasps, repetition loops) rather
   than perception, but no hardware quantities were measured.
 
-Nobody has yet combined these into one quantified error budget for this
-platform. There isn't even a public repeatability figure for a stock
-SO-101: a question asking for one in the official hardware repository is
-unanswered [5]. That's a real, specific, citable hole, not a market
+I found no published multi-source error budget for an arm in this
+class, and no closed-loop correction with before/after numbers. There
+isn't even a public repeatability figure for a stock SO-101: a question
+asking for one in the official hardware repository is unanswered [5]. That's a real, specific, citable hole, not a market
 claim.
 
 I want to build genuine ability to work in this space and with this
@@ -112,3 +124,6 @@ the design choices, the honest dead ends — actually holds up.
 5. TheRobotStudio/SO-ARM100, issue #181, "What positional repeatability
    should I expect from a stock SO-ARM101".
    <https://github.com/TheRobotStudio/SO-ARM100/issues/181>
+6. Chebly, Little, Perera, Abedeen, Suzuki, Kim, "Strong, Accurate,
+   and Low-Cost Robot Manipulator", arXiv:2507.15693, 2025.
+   <https://arxiv.org/abs/2507.15693>
