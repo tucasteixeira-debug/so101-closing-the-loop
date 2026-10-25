@@ -61,14 +61,19 @@ If these error sources are roughly independent, their variances add, and each co
 
 ## About me, and why I took this on
 
-I'm a master's student in Mechanical Engineering (Robotics & Mechatronics) at KU Leuven, after a bachelor's in Mechanical Engineering at IST Lisbon. Before this project I had worked on a pneumatic soft snake robot in a team of three, where I owned the electronics and the characterisation of its actuation delay. During an R&D internship at Siemens I built [describe2model](https://github.com/tucasteixeira-debug/describe2model), a framework that links control logic with physical models and validation data. Going in, I was close to zero in Linux, CAD, ROS 2 and machine learning.
+I'm David, a master's student in Mechanical Engineering (Robotics & Mechatronics) at KU Leuven, after a bachelor's at IST Lisbon. Before this project I had worked on a pneumatic soft snake robot and, during an internship at Siemens, built [describe2model](https://github.com/tucasteixeira-debug/describe2model), a framework linking control logic with physical models.
 
-Why this project:
-- **Maturity.** I want to turn a promising background into demonstrated capability: one real engineering problem, owned end to end, with numbers that hold up.
-- **Skills, pulled in by necessity.** Python, Linux, the servo bus, electronics, kinematics, control, vision and machine learning, each learned when the build needs it, not studied in isolation beforehand.
-- **Learning by building.** Every concept is attempted, derived, coded and then checked against the simulator or the arm. The debugging and the dead ends are recorded as part of the work.
-- **Ownership.** I make and defend the engineering decisions myself (the measurement rig, the test protocol, the correction), under real constraints, and log them honestly, including what didn't work.
-- **Working with AI agents.** AI agents act as my tutor and reviewer: they ask me questions, make me explain, and catch errors. They also run parts of my workflow, such as drafting this log for my review.
+When I started, the strongest thing I had was the way I think: an academic formation that taught me to reason through a problem carefully. But I was honest with myself about what I lacked. I didn't yet have the maturity this field asks for, in many different ways: practical skills, knowledge, parts of the academic formation itself, AI and machine learning, simulation, and the experience of making a real system work. This project is my attempt to close at least part of that gap, by taking ownership of one hardware and software project from the first screw to the final number.
+
+It works on me at several levels at once:
+
+1. **Academic.** Forward and inverse kinematics, and the physics and mathematics behind how the robot actually moves, worked through with university courses as my reference: Georgia Tech ECE 4560, MIT 6.4210 *Robotic Manipulation* and Lynch & Park's *Modern Robotics*.
+2. **My own questions.** A free space to dig into whatever I'm curious about, even when the question feels silly. For example: how can one piece of hardware (a computer) command another (a servo) just because I typed something on a keyboard? Following that question took me through software, the operating system, serial communication and the packets on the servo bus.
+3. **Coding.** Python and the MuJoCo simulator for now, and C++ later for the measurement rig.
+4. **Hardware integration.** Designing and building the independent measurement rig, integrating its cameras into the whole build, and making the hardware and the software work together as one system.
+5. **Design thinking.** Going from requirements to specifications, ideas, trade-offs and finally a solution, and being able to defend each decision. The rig, the test protocol and the correction are all chosen this way.
+
+Along the way, AI agents act as my tutor and reviewer: they ask me questions, make me explain my reasoning and catch my mistakes.
 
 More on the motivation, the field and my starting point: [`docs/about.md`](docs/about.md).
 
