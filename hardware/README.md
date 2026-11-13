@@ -25,7 +25,7 @@ Total platform cost: about $343, including the frame and one camera.
 | Calibration (`lerobot-calibrate`) | ✅ Done: both arms, 6/6 joints each (2026-10) |
 | Teleoperation | ✅ Working: follower copies the leader at 59.1 Hz (target 60 Hz) |
 | Stable port names (`/dev/serial/by-id/`) | Not yet set up |
-| Independent measurement rig | Not yet designed |
+| Independent measurement rig | v4 designed; test parts printed and fit-tested against the real cameras; full frame being printed (2026-11). Files: [`rig/`](rig/) |
 
 Details and dates are in [`PROGRESS.md`](../PROGRESS.md).
 
@@ -37,6 +37,6 @@ Details and dates are in [`PROGRESS.md`](../PROGRESS.md).
 - **`/dev/ttyACM#` numbering changes across reconnects.** Re-run `lerobot-find-port` rather than assuming a fixed port. With the ports swapped, teleoperation drives the leader and leaves the follower limp.
 - **If servos beyond a certain ID stop answering, suspect the cable after the last one that answers.** On both of my arms, a connector pin in the servo 2 → 3 cable had broken and had to be re-soldered.
 
-## Planned
+## Measurement rig
 
-- `measurement-rig/`: the independent ground-truth rig. The leading option is a fixed camera with fiducial markers; a mechanical fixture is the fallback. CAD files and design notes go here once it's designed. The rig will also be the sensor for the closed-loop correction, where the camera's measured residual drives a correction step (design session pending).
+[`rig/`](rig/) holds the independent ground-truth rig: two cameras (front and side) on one printed L-frame, watching one point on the gripper. The geometry is a Python script (build123d) with every measurement and tolerance named at the top; STL and STEP files for printing; and a verification script that checks every fit with boolean intersections. The design process, from requirements to the fit test, is in [`PROGRESS.md`](../PROGRESS.md). The same rig will later be the sensor for the closed-loop correction.

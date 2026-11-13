@@ -1,12 +1,15 @@
 # Progress Log
 
-A dated record of my project, newest first. Each entry covers one session or a span of sessions and lists, in plain terms:
+A dated record of my project, newest first. Each entry covers one session or a span of sessions and shows the engineering process as it happened:
 
-- **Achieved**: concrete, verifiable outcomes, quantified where possible.
-- **Formation**: the questions I worked through, across the full stack the project rests on. That includes computing and operating systems, communication, electronics, mechanics, kinematics, control, measurement and statistics, perception, and machine learning.
-- **Not achieved / open**: what didn't work, what is blocked, and what remains.
+- **The question** the period answered, and the number that made it non-trivial.
+- **Reasoning and decisions**: the options, the trade-off argued with physical numbers, the decision and how it was checked.
+- **Results and evidence**: what was predicted, measured or built, with units, method and spread.
+- **What failed and what it changed**: a prediction or design that failed its test, the diagnosis and the change it forced.
+- **Concepts worked through**: the ideas that drove a decision or explained a result, with their short derivation. They record what I studied, not a claim of mastery.
+- **Open**: what is still blocked or unfinished.
 
-I started from zero in most of these areas. The Formation lists record what I studied; they are not a claim of mastery. I draft entries from my private working notes with an AI-assisted workflow and review each one by hand before committing it.
+I started from zero in most of these areas. I draft entries from my private working notes with an AI-assisted workflow and review each one by hand before committing it.
 
 ## How I learn: method and references
 
@@ -16,10 +19,13 @@ In practice I work every step by hand first: derivations and sketches in my note
 
 ## Entries
 
+> **Format:** entries written from 2026-11-13 on follow the engineering process (the question, reasoning and decisions, results and evidence, what failed and what it changed, concepts worked through, open). Older entries keep the Achieved / Formation / Not achieved format.
+>
 > **2026-10-25:** project reframed from *error anatomy* to *closing the loop*: same measurements, now followed by a vision-based correction with before/after numbers. Earlier entries keep their original wording.
 
 | Dates | Entry |
 |---|---|
+| [2026-11-03 to 2026-11-13](#2026-11-03-to-2026-11-13--a-printed-two-camera-measuring-rig-from-requirements-to-a-fit-tested-design) | A printed two-camera measuring rig: from requirements to a fit-tested design |
 | [2026-10-20 to 2026-10-24](#2026-10-20-to-2026-10-24--full-3d-forward-kinematics-of-the-so-101-validated-against-mujoco) | Full 3D forward kinematics of the SO-101, validated against MuJoCo |
 | [2026-10-14 to 2026-10-20](#2026-10-14-to-2026-10-20--assembly-calibration-and-first-teleoperation-of-the-so-101-pair) | Assembly, calibration and first teleoperation of the SO-101 pair |
 | [2026-10-12 to 2026-10-13](#2026-10-12-to-2026-10-13--forward-kinematics-of-the-so-101) | Forward kinematics of the SO-101 |
@@ -28,6 +34,133 @@ In practice I work every step by hand first: derivations and sketches in my note
 | [2026-09-23 to 2026-09-25](#2026-09-23-to-2026-09-25--public-repository-version-control-and-documentation-workflow) | Public repository, version control and documentation workflow |
 | [2026-09-19 to 2026-09-23](#2026-09-19-to-2026-09-23--hardware-bring-up-servo-configuration-and-the-communication-layer) | Hardware bring-up: servo configuration and the communication layer |
 | [2026-09-12](#2026-09-12--project-planning-and-development-environment-setup) | Project planning and development environment setup |
+
+---
+
+### 2026-11-03 to 2026-11-13 · A printed two-camera measuring rig: from requirements to a fit-tested design
+
+*Question: what instrument can see one point on the gripper to a few hundredths of a millimetre in x, y and z, without relying on the arm's own sensors, and does the printed part fit the real cameras?*
+
+**How I approached the design problem**
+1. **Requirements**: what the instrument must do, in words, with no solution named.
+2. **Specifications**: a number for each requirement where one can be given, each stating what it rests on (an expectation, a physical argument, or a hard limit). Some requirements cannot be quantified and stay pass/fail.
+3. **Ideas**: my own first, sorted by physical principle.
+4. **The industry standard**: how repeatability is measured in a lab.
+5. **Trade-off**: every idea scored against the requirements.
+6. **Deep dive into the chosen idea**, ending in a decision with numbers and its known costs.
+7. **Detailed design**, verification, a physical fit test, and a redesign.
+
+The CAD is written as Python (build123d), so every dimension is a named number. Every change goes through 21 geometric checks and boolean intersections with "ghosts" of the real cameras before any file is exported.
+
+**Reasoning and decisions**
+
+*Step 1 — Requirements.* The measurand is the stopping point of one point fixed to the gripper, over ≥ 30 repeats of the same scripted move. Only its scatter matters. The instrument must:
+- R1 measure that point's position in 3D;
+- R2 measure it relative to a reference that stays fixed during one series (absolute position not needed);
+- R3 tell a translation of the gripper from a rotation;
+- R4 add little noise compared with the arm's own scatter;
+- R5 not drift during a series, and not react to changing room light;
+- R6 be independent of the arm's own sensors;
+- R7 not touch or load the arm in a way that changes its scatter;
+- R8 fit a study desk shared with everything else: compact, light, quick to set up and pack away;
+- R9 be cheap.
+
+*Step 2 — Specifications.*
+
+| Req. | Specification | What the number rests on |
+|---|---|---|
+| R1 | x, y and z, once per cycle | Physics: lift, elbow and wrist_flex turn about horizontal axes, so at a forward pose their errors land in z. 0.30 m lever × one encoder step (0.0015 rad) ≈ 0.46 mm, almost pure z |
+| R2 | None needed | Repeatability uses only distances to the cloud's own centre, so a constant offset cancels |
+| R3 | Not quantified | A point 8 mm off the roll axis moves under roll, so where the measured point sits matters |
+| R4 | Noise ≤ ¼ of the arm's σ → **0.02–0.06 mm per axis** | **Expectation.** No SO-101 figure is published. Comparable arms: RP 0.3–0.9 mm; for a round 3D cloud RP ≈ 3.6σ → σ_arm ≈ 0.08–0.25 mm. Variances add (σ²_meas = σ²_arm + σ²_inst), so ¼ inflates the result by 3 %. The stricter 1/10 is out of reach at this budget. Interim, until my own prediction replaces the literature |
+| R5 | Drift ≤ the R4 level over one series; light: not quantified | Derived from R4. The arm's base twisting 0.05° on its clamps already gives 0.26 mm at the tip |
+| R6, R7 | Pass/fail | The servo stops when its own encoder reads the goal, so the encoder reports "arrived" by construction. A spring contact presses the gears onto one side of their play every cycle, hiding the backlash to be measured |
+| R8 | Footprint ≤ 25 × 50 cm; ≤ 20 cm in one packed dimension; ≤ 2 kg; ≤ 10 min to set up, noise check included | **Limits**: measured desk 140 × 60 cm, ≈ 56 × 60 cm free at the arm |
+| R9 | ≤ €30 to buy; owned or printed parts count €0 | **Limit**: budget |
+
+*Step 3 — Ideas.* Twelve ideas sorted by principle, six of them mine: one or two cameras looking at a feature, a close-up microscope, a touch grid, an IMU, a pressure trigger, a spring probe per axis, a very tight hole, a magnet with Hall sensors, a laser lever onto a wall, and an ultrasonic sensor.
+
+*Step 4 — The industry standard.* An ISO 9283 lab set-up puts a precision cube on the gripper and reads it with three non-contact laser displacement sensors at right angles: micrometre level, but hundreds to thousands of euros each. Laser trackers and motion capture are the alternatives.
+
+*Step 5 — Trade-off against the requirements* (✓ meets · ~ borderline · ✗ fails · — not assessed):
+
+| Idea | R1 3D | R4 noise | R7 no load | R8 desk | R9 €30 | Deciding point |
+|---|---|---|---|---|---|---|
+| One camera | ~ | ~ | ✓ | ✓ | ✓ €0 | Weak along its line of sight: a 0.1 mm shift of a 30 mm feature at 300 mm is 0.6 px sideways, 0.06 px in depth |
+| **Two cameras at ~90°** | ✓ | ~ | ✓ | ~ two mounts | ✓ €0 | Each covers the other's weak axis. But one picture is coarser than R4 (marker jitter ≈ 0.05–0.1 mm), so pictures must be averaged; vibration breaks that; and the two cameras differ |
+| Close-up / microscope | ~ one plane | ✓ | ✓ | ✓ | ~ €20–40 | Small range, one plane |
+| Touch grid | ✗ no z | — | ✗ | ✓ | ~ | Touches the arm |
+| IMU | ✗ angles | ✗ drift | ✓ | ✓ | ✓ | Gives angles, not positions |
+| Pressure trigger | ✗ | — | ✗ | ✓ | ✓ | Says *when*, not *where* |
+| Spring probe per axis | ✓ | ✓ 0.01 mm | ✗ preload | ✗ alignment | ✗ €40–80 | Hides the backlash it should measure |
+| Tight hole | ✗ one bit | — | ✗ | ✓ | ✓ | Guides the gripper, i.e. corrects the error → kept as a *task* idea |
+| Magnet + Hall | ✓ in theory | ? | ✓ | ~ mm range | ~ €10–25 | Unproven → kept for later |
+| Laser lever | ✗ rotation only | ✓ angle | ✓ | ✗ needs a wall | ✓ €5 | Rotation only → kept for later |
+| Ultrasonic | ~ one axis | ✗ | ✓ | ✓ | ✓ | One 4 µs timer step ≈ 0.7 mm; ≈ 0.5 mm per °C at 300 mm |
+| Lab standard (cube + 3 lasers) | ✓ | ✓ µm | ✓ | — | ✗ | Works in a mm range around one point, so it cannot guide the later correction |
+
+No idea passes every requirement. Two cameras is the only one with no ✗, and its weak point (R4) can be tested and improved, while the others fail on something fundamental. The budget tilted the field towards owned parts. If the cameras fail R4, the budget is revisited rather than the requirement lowered.
+
+*Step 6 — Deep dive into the cameras → decision.*
+- **Placement: front + side on one low L-frame.** Front + side rather than top + side: z, where the largest errors are expected, is seen twice, and a top camera needs a cantilever post, the floppiest shape (R5). One frame, because two stands could drift against each other.
+- **Distance.** Close is better, since field width ≈ 2d·tan(½ field of view). How close is set by focus, so I ran a ruler test: a tape measure as target, raw frames at 8, 10, 12, 15 and 17 cm, pixels counted between cm marks, sharpness from the variance of the Laplacian.
+  - The webcam has a **fixed-focus lens**. At 8 cm it would give 0.042 mm/px, but it is blurred there. Sharpness was 50 / 116 / 82 at 12 / 15 / 17 cm, so it is usable only from about 15 cm, with best focus at 15–16 cm. Side distance: **155 mm** (≈ 0.085 mm/px, 157 mm field).
+  - The board camera (OV9732) has a screw focus and is crisp at 10 cm: 0.115 mm/px over 147 mm. Front distance: **100 mm**.
+- **Assignment.** The finer webcam goes on the side, watching x, the arm's hardest-to-read axis. The board camera goes in front for y and z.
+- **What this choice costs.**
+  - It is far less precise than the lab standard (micrometres there; 20–60 µm is the target here).
+  - Each camera is 0.085–0.115 mm per pixel, coarser than R4. The method depends on sub-pixel localisation (¼–⅕ px) and on averaging N pictures (σ/√N), which only works if the frames are independent; vibration or light flicker break that.
+  - The two cameras differ in resolution and focus, so each needs its own calibration, and the front camera is ≈ 1.4× coarser.
+  - Exposure, white balance and focus must be locked by hand.
+
+  These are the risks the noise test must settle.
+
+*Step 7 — Detailed design.*
+- **Clamping a camera without loading it.** My first idea was to squeeze 1.5 mm of rubber by 0.8 mm. Thin confined rubber is nearly incompressible, so that squeeze needs ≈ 1800 N. I replaced it with a hard stop, so bolt torque never reaches the camera, plus a PLA strap as a leaf spring on two 1 mm pivot ridges. A 0.5 mm bow gives 12 N at 8 MPa, below PLA's ≈ 12 MPa creep limit.
+- **Tolerance rule: only the cameras fit, everything else is clearance.** Dimensions known only to ±2 mm became adjustable, with printed spacers setting the clamp height. The camera board is held by an exact constraint: one round datum hole, one slot along x, one along z, one free post. My earlier four 45° slots absorb only equal errors in both directions; the boolean check failed 11 of 15 pitch combinations, and the new pattern passes all 15.
+
+**Results and evidence**
+
+> [!IMPORTANT]
+> **Milestones**
+> - **First printed parts of the measurement rig fit-tested against the real cameras.** I measured every misfit in millimetres and turned it into the numbers of the next version (v4).
+
+- Design v4: [`hardware/rig/`](hardware/rig/) (geometry script, STL and STEP files). The full frame (121 g, 5 h 38 in the slicer) has been ordered from a fab lab.
+- I estimated what a 2 N bump does to the instrument: front tower 2.4 µm, side tower 2.2 µm, i.e. 4–6 µm of apparent motion at the gripper. A 1 °C change moves the 150 mm side arm by 10 µm. Both are below the 20–60 µm noise target. Free-standing, the frame tips at 1.9 N and slides at 1.3 N, so 400 g of ballast is part of the design (6.7 / 3.7 N).
+
+<p align="center">
+  <img src="docs/media/rig_v2_with_arm.png" width="720" alt="MuJoCo render of the printed rig next to the SO-101 at the test pose, with top view and the two camera views">
+  <br>
+  <em><b>Figure 1.</b> Simulation of the public SO-101 model with the rig's real STL (v2) placed next to it at the test pose. Top: overview and top view. Bottom: what the front camera (100 mm) and the side camera (150 mm) see; the red dot is the measured point.</em>
+</p>
+
+<p align="center">
+  <img src="docs/media/rig_v3_cad.png" width="720" alt="CAD renders of the v3 webcam cradle, its top view, the camera-board plate and the L-frame">
+  <br>
+  <em><b>Figure 2.</b> CAD of rig v3: webcam cradle with strap and spacers, top view of the stub pocket, the camera-board plate on four posts with slots, and the L-frame. v4 changes only the webcam cradle's height and depth.</em>
+</p>
+
+**What failed and what it changed**
+- **Re-verification against the real cameras (v2 → v3)** found design errors that the checks on the drawings had missed:
+  - the webcam's mounting stub is on the bottom, not the back (the camera would have sat 6 mm high);
+  - the strap presses at the two ends of the camera's flat top, not mid-span (stiffness ≈ 25 N/mm, not 9);
+  - the board's standoff bars sat under two lens-holder screw heads;
+  - the 45° slot pattern above.
+
+  Rule since then: a check that passes only at the nominal dimension is not a check.
+- **Fit test of the printed parts (v3 → v4).**
+  - Webcam height: assumed 24 ± 2 mm; measured 25.8 ± 0.4 mm from photos, scaled by known part dimensions and cross-checked between two views. The strap therefore bowed ≈ 4 mm instead of 0.5, i.e. ≈ 55 N and ≈ 45 MPa, far above creep. Fix: pillars 21.5 → 24.3 mm (= camera 25.8 − ridge 1 − bow 0.5).
+  - Pocket play: ≈ 1 mm front to back let the camera tip 2–4°. Fix: pocket 22 → 21.2 mm, 0.4 mm per wall rather than 1 mm, because printed pockets come out ≈ 0.3 mm small. That leaves ≈ 0.4 mm of play and < 1° of tip.
+
+**Concepts worked through**
+- Why does the webcam offer raw 1080p only at 5 fps? Data rate = width × height × bytes per pixel × fps = 1920 × 1080 × 2 × 5 ≈ 20.7 MB/s, about what USB 2 carries. Compressed MJPEG reaches 30 fps but blurs edges, so measurements use raw single frames.
+- How does a leaf spring give a defined clamp force? Simply supported, k = 48EI/L³, and the stress grows as E·t·(bow)/L². Fixing the bow with spacers fixes the force, whatever the exact camera height; a thicker strap raises the stress at the same bow.
+- Why three bolts and not four on the camera board? Each tight hole forces a coincidence. Four over-constrain the board, so one bad pitch jams it. One datum plus one slot fixes position and rotation; the rest must be free.
+- Side work (microcontroller): what turns a `.c` file into bytes on a chip? The compiler makes machine code with blanks for calls into other files. The linker gives every function an address and fills the blanks, producing an `.elf` (kept on the laptop for debugging) and a `.bin` (the raw bytes that are flashed). My first ESP32 test build: 125,920 bytes. This prepares a servo step-response bench in C.
+
+**Open**
+- The v4 webcam cradle is untested (only v3 was printed), and the full frame is not yet assembled.
+- Whether sub-pixel localisation and averaging reach 0.02–0.06 mm with these cameras, given vibration and light, is unknown until the noise test.
 
 ---
 

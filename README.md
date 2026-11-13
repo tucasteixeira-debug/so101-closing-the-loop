@@ -24,7 +24,7 @@ An **error budget** splits the total miss into these shares, so that the fix tar
 2. Decompose that miss into its mechanical and control shares (and, as a stretch phase, the policy's), predicted first and then measured.
 3. Close the loop: a vision-based correction driven by the same camera, with repeatability measured before and after.
 
-> **Status (2026-10-25):** both arms are assembled, calibrated and teleoperating. Full 3D forward kinematics is validated against the MuJoCo model. On 2026-10-25 the project was reframed from *error anatomy* to *closing the loop*: same measurements, now followed by a vision-based correction. **No repeatability has been measured yet.** The full dated record is in [`PROGRESS.md`](PROGRESS.md).
+> **Status (2026-11-13):** both arms are assembled, calibrated and teleoperating, and full 3D forward kinematics is validated against the MuJoCo model. The independent two-camera measuring rig is designed ([`hardware/rig/`](hardware/rig/), v4): its first printed parts have been fit-tested against the real cameras, and the full frame is being printed. **No repeatability has been measured yet.** The full dated record is in [`PROGRESS.md`](PROGRESS.md).
 
 **Timeline.** The project is split into gates. Each gate ends in a result that can be shown, so the project is complete up to whichever gate it reaches.
 
