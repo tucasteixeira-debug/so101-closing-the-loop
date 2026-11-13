@@ -27,6 +27,7 @@ In practice I work every step by hand first: derivations and sketches in my note
 |---|---|
 | [2026-11-03 to 2026-11-13](#2026-11-03-to-2026-11-13--a-printed-two-camera-measuring-rig-from-requirements-to-a-fit-tested-design) | A printed two-camera measuring rig: from requirements to a fit-tested design |
 | [2026-11-05 to 2026-11-09](#2026-11-05-to-2026-11-09--measurement-method-the-test-pose-and-how-to-split-the-scatter) | Measurement method: the test pose and how to split the scatter |
+| [2026-10-26 to 2026-10-27](#2026-10-26-to-2026-10-27--first-scripts-on-the-real-arm-hold-offsets-tracking-lag-and-a-first-grasp) | First scripts on the real arm: hold offsets, tracking lag and a first grasp |
 | [2026-10-20 to 2026-10-24](#2026-10-20-to-2026-10-24--full-3d-forward-kinematics-of-the-so-101-validated-against-mujoco) | Full 3D forward kinematics of the SO-101, validated against MuJoCo |
 | [2026-10-14 to 2026-10-20](#2026-10-14-to-2026-10-20--assembly-calibration-and-first-teleoperation-of-the-so-101-pair) | Assembly, calibration and first teleoperation of the SO-101 pair |
 | [2026-10-12 to 2026-10-13](#2026-10-12-to-2026-10-13--forward-kinematics-of-the-so-101) | Forward kinematics of the SO-101 |
@@ -193,6 +194,38 @@ No idea passes every requirement. Two cameras is the only one with no ✗, and i
 **Open**
 - The start pose of each cycle is not chosen yet, and it is part of the protocol.
 - Whether the end positions vary by more than one count across cycles decides whether the control part can be resolved at all.
+
+---
+
+### 2026-10-26 to 2026-10-27 · First scripts on the real arm: hold offsets, tracking lag and a first grasp
+
+*Question: how far from its command does a real joint stop, and does a P-only servo sagging under gravity explain it?*
+
+**Results and evidence**
+
+> [!IMPORTANT]
+> **Milestones**
+> - **First grasp on the real follower**, from my own script: all six joints moved together to a pose, the gripper took a handed-in object and carried it back to rest (900/900 ticks at 50 Hz).
+
+- Code: [`C3.py`](sim/exercises/lesson_C/C3.py). Each tick sends targets, reads the six angles and logs both, padded to 0.02 s. One shared α = k/n moves every joint, so all joints start and arrive together.
+- I read the servo registers first: P 16, D 32, I 0, dead band ±1 count (0.088°) on every joint, all written by LeRobot at connect. **Predicted** hold offset: 1–10°. **Measured** (one run, 6 joints): 0.3–1.7° (3–19 counts), constant over a 10 s hold, and every joint stopped short on the side it came from. That includes pan (−0.68°), which carries no gravity load, so gravity alone does not explain it. Working hypothesis: friction-limited P control.
+- Tracking lag grows with speed: 1.6° at 5°/s, 2.4° at 17.5°/s, ≈ 3.5–4° at 35°/s (shoulder_lift, separate runs).
+
+<p align="center">
+  <img src="docs/media/so101_first_grasp.gif" width="480" alt="The SO-101 follower moving to a pose, gripping a tape measure and returning to rest">
+  <br>
+  <em><b>Figure 1.</b> First grasp on the real follower: a scripted 6-joint move, the gripper closes on a handed-in tape measure, and the arm returns to rest (video at 1.5× speed).</em>
+</p>
+
+**What failed and what it changed**
+- The elbow rests at the top of its range, so a +10° command went past it. LeRobot clipped each command to 5° and the servo's limit held the joint, but my log recorded the intended target and showed a −10.44° "offset" that was never commanded. Since then I log what was actually sent.
+
+**Concepts worked through**
+- Why does a P-only joint settle short under load? At rest, the spring torque balances the load, kp·e = τ_load, so e = τ/kp: a softer spring gives a bigger offset, and with I = 0 nothing removes it. In the simulation model this is 0.673/998 rad = 0.039°.
+- What does a dead band do under friction? Errors within ±1 count produce no torque. If gearbox friction exceeds the load, the joint can rest anywhere in the band, and where it rests depends on the direction it came from. After a hand push, pan came back to within one count.
+
+**Open**
+- Friction or gravity: to separate them, approach the same goal from both sides (a friction offset flips sign).
 
 ---
 

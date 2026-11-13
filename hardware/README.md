@@ -24,7 +24,7 @@ Total platform cost: about $343, including the frame and one camera.
 | Mechanical assembly | ✅ Done: both arms (2026-10) |
 | Calibration (`lerobot-calibrate`) | ✅ Done: both arms, 6/6 joints each (2026-10) |
 | Teleoperation | ✅ Working: follower copies the leader at 59.1 Hz (target 60 Hz) |
-| Stable port names (`/dev/serial/by-id/`) | Not yet set up |
+| Stable port names | ✅ Done: fixed names from each board's USB serial number, via a udev rule (2026-10) |
 | Independent measurement rig | v4 designed; test parts printed and fit-tested against the real cameras; full frame being printed (2026-11). Files: [`rig/`](rig/) |
 
 Details and dates are in [`PROGRESS.md`](../PROGRESS.md).
