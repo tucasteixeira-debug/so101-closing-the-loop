@@ -1,0 +1,96 @@
+=== 1. WEBCAM IN THE CRADLE (local cradle frame) ===
+  camera min     68.5x20.1x24.8: overlap with cradle = 0.00 mm3  OK (sits in, no clash)
+     front slack when pushed back: 1.1 mm; side slack total: 4.5 mm
+  camera nominal 70.0x20.5x25.8: overlap with cradle = 0.00 mm3  OK (sits in, no clash)
+     front slack when pushed back: 0.7 mm; side slack total: 3.0 mm
+  camera max     71.5x20.9x26.8: overlap with cradle = 0.00 mm3  OK (sits in, no clash)
+     front slack when pushed back: 0.3 mm; side slack total: 1.5 mm
+
+=== 2. STUB vs POCKET ===
+  stub OD 14.0 in pocket Ø18.0: radial clearance 2.0; stub 6.0 long, pocket 8.0 deep -> 2.0 mm spare
+  camera's flat bottom (50.0 long) rests on floor from |x|=9 to 25: 16 mm each side
+  stub pocket side-slack vs camera side-slack: camera may sit +-1.5 along x, stub clearance 2.0 -> OK, pocket never binds first
+
+=== 3. STRAP, BOLTS, NUTS (one bolt axis, trace top to bottom) ===
+  bolt L: axis x=-42.00
+     strap hole Ø3.6 at x=-42.00 (strap) vs pillar hole at x=-42.00: concentric
+     head sits at z=28.3; ridge 1.0 on pillar top z=24.3
+     nut slot z 17.5..20.3, slot x from -38.42 to -48.50 (bolt at -42.00): bolt axis inside slot
+     bolt tip at zero spacers: z=12.3; pillar hole bottom z=-3 -> clears
+     thread through the nut at MAX spacers (4.6): bolt reaches z=16.9, nut bottom at z=17.7 -> engagement 0.8 mm past the nut (OK)
+  bolt R: axis x=42.00
+     strap hole Ø3.6 at x=42.00 (strap) vs pillar hole at x=42.00: concentric
+     head sits at z=28.3; ridge 1.0 on pillar top z=24.3
+     nut slot z 17.5..20.3, slot x from 38.42 to 48.50 (bolt at 42.00): bolt axis inside slot
+     bolt tip at zero spacers: z=12.3; pillar hole bottom z=-3 -> clears
+     thread through the nut at MAX spacers (4.6): bolt reaches z=16.9, nut bottom at z=17.7 -> engagement 0.8 mm past the nut (OK)
+  nut slot opens on the pillar's outer face (x=47.5 < slot out 48.5): yes, slide the nut in from outside
+  nut across-flats 5.5 in slot width 5.9 (y), thickness 2.4 in 2.8: nut cannot turn -> bolt tightens one-handed
+
+=== 4. CLAMP FORCE: does the strap actually touch the camera? ===
+  strap on ridges (span 84), camera's flat ends at +-25: k=25 N/mm
+    camera 24.8: spacers 0.0 -> bow 0.50 mm -> 12.4 N  OK
+    camera 25.3: spacers 0.5 -> bow 0.50 mm -> 12.4 N  OK
+    camera 25.8: spacers 1.0 -> bow 0.50 mm -> 12.4 N  OK
+    camera 26.3: spacers 1.5 -> bow 0.50 mm -> 12.4 N  OK
+    camera 26.8: spacers 2.0 -> bow 0.50 mm -> 12.4 N  OK
+  friction holds the camera against a tug: mu~0.5 x 5 N = 2 N minimum (a hard cable tug is ~2 N)
+
+=== 5. CABLE PATH ===
+  cable exit at x=-22, z=5.0 (Ø4.0): notch |x| 16..28, open from z=1 to top -> passes, with the +-3 mm position tolerance
+     camera may sit +-1.5 along x: cable then at 20.5..23.5 vs notch 16..28 -> margin 2.5 mm beyond the cable radius
+  cable exit at x=+22, z=5.0 (Ø4.0): notch |x| 16..28, open from z=1 to top -> passes, with the +-3 mm position tolerance
+     camera may sit +-1.5 along x: cable then at 20.5..23.5 vs notch 16..28 -> margin 2.5 mm beyond the cable radius
+  behind the back stop: the frame's side tower is there. Cable must turn down into the channel trough: gap between back stop outer face and ... (checked in frame section)
+
+=== 6. OV9732 BOARD ON THE PLATE (local plate frame) ===
+  board         vs plate+posts: overlap 0.00 mm3  OK
+  plug          vs plate+posts: overlap 0.00 mm3  OK
+  screw head L  vs plate+posts: overlap 0.00 mm3  OK
+  screw head R  vs plate+posts: overlap 0.00 mm3  OK
+  gold holes vs holes/slots (bolt Ø2.5 in Ø3.2) for the pitch range, board shifted so BL sits on the datum:
+    pitch 26.8 x 26.8: OK
+    pitch 26.8 x 28.6: OK
+    pitch 26.8 x 30.4: OK
+    pitch 27.8 x 26.8: OK
+    pitch 27.8 x 28.6: OK
+    pitch 27.8 x 30.4: OK
+    pitch 28.6 x 26.8: OK
+    pitch 28.6 x 28.6: OK
+    pitch 28.6 x 30.4: OK
+    pitch 29.4 x 26.8: OK
+    pitch 29.4 x 28.6: OK
+    pitch 29.4 x 30.4: OK
+    pitch 30.4 x 26.8: OK
+    pitch 30.4 x 28.6: OK
+    pitch 30.4 x 30.4: OK
+  nut side (+y face): flat plate 4 mm, slot ends 3.6 from each hole centre; M2.5 nut AF 5.0 + washer Ø6 sits on the flat -> OK
+  plug in the plate's bottom gap: gap 16.6 wide (plug 12.6), reaches z=-9.6 (plug top at -11.6) -> plug connector can be inserted from below with 4.0 mm total side room
+  lens: Ø14 barrel, reach 13.0 at 10 cm; nothing in front of the board -> fingers can turn it to focus
+
+=== 7. ASSEMBLED FRAME: ghosts vs frame ===
+  webcam body+stub  overlap 0.00  OK
+  OV board          overlap 0.00  OK
+  OV lens           overlap 0.00  OK
+  measured point    overlap 0.00  OK
+  webcam lens face at y = -155.0 (target -155.0); lens centre z = 92, x = 0 -> aims at the point
+  OV lens front at x = 100.0 (target 100.0); centre z = 92
+  webcam cable leaves the back stop toward -y; side tower is 27 deep there and the cable notch is in the back stop's outer face: cable drops along the tower's back face (y=-179) into the side pad / trough. Tie holes at x=62,74 (side arm).
+  OV cable leaves the plate's bottom gap at x=120, z<70; tower top is at z=70 and tower face is flush with the plate face -> cable runs down the front face of the tower to the trough; tie holes at y=-62,-74 (front arm).
+
+=== 8. STABILITY (tipping / sliding) ===
+  frame CAD centre at (60,-102,40); cameras at z=92
+  ballast   0 g: mass 223 g, CoM z=58: tip (push at camera height, toward -y) 1.9 N; slide 1.3 N
+  ballast 400 g: mass 623 g, CoM z=26: tip (push at camera height, toward -y) 6.7 N; slide 3.7 N
+  vibration: lowest natural freq ~22 Hz (side tower); a bump settles in <1 s; nothing is near a servo frequency
+
+=== 9. MATERIAL: where the grams go (CAD volume per feature) ===
+  side arm channel     23.3 cm3
+  front arm channel    24.3 cm3
+  side pad             13.3 cm3
+  front pad             5.9 cm3
+  front tower          68.6 cm3
+  side tower           89.1 cm3
+  OV plate              8.9 cm3
+  cradle               21.3 cm3
+  sum of features 254.8 (union 242.8: overlaps removed)
