@@ -28,6 +28,7 @@ In practice I work every step by hand first: derivations and sketches in my note
 | [2026-11-03 to 2026-11-13](#2026-11-03-to-2026-11-13--a-printed-two-camera-measuring-rig-from-requirements-to-a-fit-tested-design) | A printed two-camera measuring rig: from requirements to a fit-tested design |
 | [2026-11-05 to 2026-11-09](#2026-11-05-to-2026-11-09--measurement-method-the-test-pose-and-how-to-split-the-scatter) | Measurement method: the test pose and how to split the scatter |
 | [2026-10-26 to 2026-10-27](#2026-10-26-to-2026-10-27--first-scripts-on-the-real-arm-hold-offsets-tracking-lag-and-a-first-grasp) | First scripts on the real arm: hold offsets, tracking lag and a first grasp |
+| [2026-10-24 to 2026-10-25](#2026-10-24-to-2026-10-25--gripper-orientation-added-to-the-forward-kinematics-validated-against-mujoco) | Gripper orientation added to the forward kinematics, validated against MuJoCo |
 | [2026-10-20 to 2026-10-24](#2026-10-20-to-2026-10-24--full-3d-forward-kinematics-of-the-so-101-validated-against-mujoco) | Full 3D forward kinematics of the SO-101, validated against MuJoCo |
 | [2026-10-14 to 2026-10-20](#2026-10-14-to-2026-10-20--assembly-calibration-and-first-teleoperation-of-the-so-101-pair) | Assembly, calibration and first teleoperation of the SO-101 pair |
 | [2026-10-12 to 2026-10-13](#2026-10-12-to-2026-10-13--forward-kinematics-of-the-so-101) | Forward kinematics of the SO-101 |
@@ -226,6 +227,23 @@ No idea passes every requirement. Two cameras is the only one with no ✗, and i
 
 **Open**
 - Friction or gravity: to separate them, approach the same goal from both sides (a friction offset flips sign).
+
+---
+
+### 2026-10-24 to 2026-10-25 · Gripper orientation added to the forward kinematics, validated against MuJoCo
+
+*Question: placement is measured at the object, a few centimetres from the wrist, so a turn error becomes a position error. How does the gripper's orientation follow from the joint angles?*
+
+**Results and evidence**
+- Code: [`ex6_so101_fk_orientation.py`](sim/exercises/lesson_B/ex6_so101_fk_orientation.py). My forward kinematics now returns the gripper's orientation as R = R_joints · R₀, where R_joints is the rotation block of the product of the five joint transforms, and R₀ is the gripper's orientation at the zero pose, read once from the model.
+- R₀ is a pure twist of 2.79° about the gripper's pointing axis (rebuilt to 5.6 × 10⁻¹⁶). At pan 30° and at wrist_roll 90°, my matrix matches MuJoCo to every printed digit, with RᵀR = I and det = 1.
+
+**Concepts worked through**
+- Why is orientation a 3×3 matrix and not three more numbers? One arrow fixes where the gripper points (2 numbers), and the spin about it is one more, which on the SO-101 is wrist_roll. The matrix stores the gripper's three axis arrows in world coordinates: 9 numbers minus 3 unit-length and 3 perpendicularity conditions leaves 3 free.
+- How are two orientations compared with one number? Subtract the matrices and take the length of all 9 differences. A turn by θ moves each swinging unit arrow's tip along a chord 2 sin(θ/2), and two of the three arrows swing, so ‖ΔR‖ = √2 · 2 sin(θ/2) → θ = 2 arcsin(‖ΔR‖ / 2√2). Check: a 1° pan error gives ‖ΔR‖ = 0.02468 → 1.000°.
+
+**Open**
+- The orientation check over many random poses is not yet in the published script.
 
 ---
 
