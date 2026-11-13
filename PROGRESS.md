@@ -26,6 +26,7 @@ In practice I work every step by hand first: derivations and sketches in my note
 | Dates | Entry |
 |---|---|
 | [2026-11-03 to 2026-11-13](#2026-11-03-to-2026-11-13--a-printed-two-camera-measuring-rig-from-requirements-to-a-fit-tested-design) | A printed two-camera measuring rig: from requirements to a fit-tested design |
+| [2026-11-05 to 2026-11-09](#2026-11-05-to-2026-11-09--measurement-method-the-test-pose-and-how-to-split-the-scatter) | Measurement method: the test pose and how to split the scatter |
 | [2026-10-20 to 2026-10-24](#2026-10-20-to-2026-10-24--full-3d-forward-kinematics-of-the-so-101-validated-against-mujoco) | Full 3D forward kinematics of the SO-101, validated against MuJoCo |
 | [2026-10-14 to 2026-10-20](#2026-10-14-to-2026-10-20--assembly-calibration-and-first-teleoperation-of-the-so-101-pair) | Assembly, calibration and first teleoperation of the SO-101 pair |
 | [2026-10-12 to 2026-10-13](#2026-10-12-to-2026-10-13--forward-kinematics-of-the-so-101) | Forward kinematics of the SO-101 |
@@ -161,6 +162,37 @@ No idea passes every requirement. Two cameras is the only one with no ✗, and i
 **Open**
 - The v4 webcam cradle is untested (only v3 was printed), and the full frame is not yet assembled.
 - Whether sub-pixel localisation and averaging reach 0.02–0.06 mm with these cameras, given vibration and light, is unknown until the noise test.
+
+---
+
+### 2026-11-05 to 2026-11-09 · Measurement method: the test pose and how to split the scatter
+
+*Question: at which pose should the arm be measured, and how can one measured scatter be split into a control part and a mechanical part?*
+
+**Method and references**
+- I derived the Jacobian by hand for a planar 2-link arm and coded it. I then evaluated the SO-101's Jacobian at poses taught by hand on the real arm and checked it against MuJoCo.
+
+**Reasoning and decisions**
+- **Splitting the scatter.** Each cycle has three positions: commanded → encoder reading → real tip (camera). Control = commanded − encoder; mechanical = camera − FK(encoder). Only spreads count, so a constant offset drops out. The variances add if the two parts are independent, which is an assumption to check on the data. Limit: the encoder reads whole counts (0.088° ≈ 0.3 mm at the tip) while the camera aims at ≈ 0.05 mm, so the control part may only be an upper bound. No pose can fix this: a longer lever scales the arm's scatter and one count by the same factor.
+- **Test pose.** Criterion: the predicted tip scatter per axis, √Σⱼ (Jᵢⱼ σ_θ)² with σ_θ = 1 count (assumed, not measured), must be ≥ 4× the instrument noise. Also: away from a straight arm and from the joint limits. I kept pan ≠ 0 on purpose, because the motion in each cycle is what exercises a joint's backlash, while its angle does not change its Jacobian column.
+
+**Results and evidence**
+
+> [!IMPORTANT]
+> **Milestones**
+> - **Test pose taught by hand on the real arm and checked with the Jacobian.** For one encoder count on every joint, the predicted tip scatter is 0.28 / 0.49 / 0.63 mm in x / y / z, i.e. ≥ 4.6× the noise ceiling on every axis. Condition number 5.4; 39° from the nearest joint limit.
+
+- First Jacobian, my own: [`ex7_jacobian_2link.py`](sim/exercises/lesson_B/ex7_jacobian_2link.py). For one encoder step on both joints, J·Δθ predicts the tip to 0.0006 mm. For a 0.1 / 0.2 rad error it is off by 5.5 mm (13 %): the linear model holds only for small errors.
+- Joint angles from the arm's calibration map to the MuJoCo model as degrees → radians with no sign flips. Of all 16 sign combinations, only this one gives a *constant* height gap (29–35 mm) against a ruler at 5 poses, i.e. a different reference point, not a wrong angle.
+
+**Concepts worked through**
+- Why can a tip miss not be traced back to the joints? The tip Jacobian is 3 × 5: three equations, five unknowns. Lift, elbow and wrist_flex turn about parallel horizontal axes, so their columns lie in one vertical plane. The combination 0.567 : −0.905 : 1 moves the tip by exactly 0 mm and only tilts the gripper. So joint errors are used only forward (encoder scatter → J → predicted tip scatter).
+- What does one column of the Jacobian say? It is how far one radian of that joint moves the tip, i.e. axis × lever. Wrist roll gives 8 mm/rad, because the measured point sits ≈ 8 mm off the roll axis. One count there moves the tip 0.012 mm.
+- Why do the hold offsets not come from gravity sag? With the goal set to where a hand-placed arm already is, the held angle equals the placed one to 0–2 counts: friction holds it. The 0.3–1.7° offsets therefore come from stopping short during the move.
+
+**Open**
+- The start pose of each cycle is not chosen yet, and it is part of the protocol.
+- Whether the end positions vary by more than one count across cycles decides whether the control part can be resolved at all.
 
 ---
 
