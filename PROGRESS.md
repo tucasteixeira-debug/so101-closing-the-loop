@@ -25,6 +25,7 @@ In practice I work every step by hand first: derivations and sketches in my note
 
 | Dates | Entry |
 |---|---|
+| [2026-11-13 to 2026-11-23](#2026-11-13-to-2026-11-23--first-prototype-of-the-measuring-rig-next-to-the-arm) | First prototype of the measuring rig next to the arm |
 | [2026-11-03 to 2026-11-13](#2026-11-03-to-2026-11-13--a-printed-two-camera-measuring-rig-from-requirements-to-a-fit-tested-design) | A printed two-camera measuring rig: from requirements to a fit-tested design |
 | [2026-11-05 to 2026-11-09](#2026-11-05-to-2026-11-09--measurement-method-the-test-pose-and-how-to-split-the-scatter) | Measurement method: the test pose and how to split the scatter |
 | [2026-10-26 to 2026-10-27](#2026-10-26-to-2026-10-27--first-scripts-on-the-real-arm-hold-offsets-tracking-lag-and-a-first-grasp) | First scripts on the real arm: hold offsets, tracking lag and a first grasp |
@@ -39,6 +40,49 @@ In practice I work every step by hand first: derivations and sketches in my note
 | [2026-09-12](#2026-09-12--project-planning-and-development-environment-setup) | Project planning and development environment setup |
 
 ---
+
+### 2026-11-13 to 2026-11-23 · First prototype of the measuring rig next to the arm
+
+*Question: once built and placed next to the arm, does the rig see the gripper tip sharply from both directions, as designed?*
+
+**Results and evidence**
+> [!IMPORTANT]
+> **Milestones**
+> - **First time the arm, the rig and both camera views worked together:** the arm holding the test pose, both cameras aimed at the fixed-jaw tip.
+- Side project, ongoing: embedded C on an ESP32 driving the spare servo over UART, to understand the servo bus from the bits up. Timing measured on a logic analyzer and UART framing worked through; not yet talking to the servo.
+
+<p align="center">
+  <img src="docs/media/rig_v4_prototype_setup.jpg" width="480" alt="SO-101 follower arm holding the test pose next to the printed two-camera rig">
+  <br>
+  <em><b>Figure 1.</b> First prototype of the measuring rig next to the arm in its test pose: the webcam (nearest tower) sees the gripper from the side, the board camera (right tower) looks along it.</em>
+</p>
+
+<p align="center">
+  <img src="docs/media/rig_v4_prototype_top_tape.jpg" width="320" alt="Top view of the arm and the L-shaped rig, distance measured with a tape">
+  <br>
+  <em><b>Figure 2.</b> Top view: the L-shaped frame holds both cameras at 90° around the gripper tip. Placed by hand and checked with a tape; marked positions on the desk now replace this.</em>
+</p>
+
+**What went against expectations**
+- **Expected:** the side webcam sharp from 15 cm, as in my earlier ruler test. **Found:** the jaw was soft. I first blamed distance, and it was partly that: 15 cm was the very edge of the webcam's fixed focus. But mostly it was light. Against the dark background, auto-exposure pushed the white plastic into full white, and its edge glowed. A flat ruler test hadn't shown either effect. → Webcam moved to 17 cm; soft, constant light and manual exposure next.
+- **New trade-off: side sharpness against front centring.** The single rigid frame was a deliberate choice, so both cameras share the same error if the frame shifts. It was sized for the webcam at 15 cm. Once the webcam needed 17 cm (point above), the two demands stopped fitting together: every centimetre the rig moves back to sharpen the side view slides the tip a centimetre off-centre in the front view (Figure 3). → Chose side sharpness: at 17 cm the tip sits about 8° off the front camera's axis, still sharp and well inside its view.
+- **The rig had no placement reference.** The result doesn't depend on where the rig sits, since repeatability is measured around the cluster's own centre, but focus and framing do. → Marked positions on the desk.
+
+<p align="center">
+  <img src="docs/media/rig_v4_camera_tradeoff.jpg" width="720" alt="Two rows of side and front camera views showing the trade-off">
+  <br>
+  <em><b>Figure 3.</b> What the rig's cameras see. A: tip centred in the front view, but the side webcam too close (soft, glare). B: rig moved back until the webcam is sharp; the tip moves to the edge of the front view.</em>
+</p>
+
+**Concepts worked through**
+- Why does a fixed-focus camera have a minimum distance? The closer the object, the further behind the lens its image forms. A lens fixed at the factory for far scenes can't follow, so below a certain distance each point blurs into a disc. The board camera's screw lens can be set to its working distance; the webcam's can't.
+- Why was a sharpness score misleading here? It measures contrast, not focus. Lighting the textured background raised the score while the jaw itself got worse.
+
+**Next steps**
+1. Fixed light and manual exposure, so the white jaw never clips.
+2. A small coloured dot on the fixed jaw, found in each image by colour clustering, as the measured point.
+3. **Noise test of the instrument:** with the arm still, take about 100 pictures per camera and measure how much the found dot position wanders. That spread is the rig's own precision. It must come out at about a quarter of the arm's expected scatter (≈ 0.02–0.06 mm) for the arm's scatter to be measurable at all. Averaging several pictures per cycle can bring it down if one picture alone isn't enough.
+4. Then the first series: 30 cycles to the test pose.
 
 ### 2026-11-03 to 2026-11-13 · A printed two-camera measuring rig: from requirements to a fit-tested design
 

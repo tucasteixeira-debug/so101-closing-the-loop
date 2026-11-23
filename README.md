@@ -24,7 +24,11 @@ An **error budget** splits the total miss into these shares, so that the fix tar
 2. Decompose that miss into its mechanical and control shares (and, as a stretch phase, the policy's), predicted first and then measured.
 3. Close the loop: a vision-based correction driven by the same camera, with repeatability measured before and after.
 
-> **Status (2026-11-13):** both arms are assembled, calibrated and teleoperating, and full 3D forward kinematics is validated against the MuJoCo model. The independent two-camera measuring rig is designed ([`hardware/rig/`](hardware/rig/), v4): its first printed parts have been fit-tested against the real cameras, and the full frame is being printed. **No repeatability has been measured yet.** The full dated record is in [`PROGRESS.md`](PROGRESS.md).
+> **Status (2026-11-23):** both arms are assembled, calibrated and teleoperating, and full 3D forward kinematics is validated against the MuJoCo model. The independent two-camera measuring rig ([`hardware/rig/`](hardware/rig/), v4) is printed and has been set up next to the arm for the first time: the first camera views showed what the next iteration must fix (a placement reference, the webcam's working distance, lighting on white plastic). **No repeatability has been measured yet.** The full dated record is in [`PROGRESS.md`](PROGRESS.md).
+
+<img src="docs/media/rig_v4_prototype_setup.jpg" alt="First prototype of the two-camera measuring rig next to the SO-101 follower arm" width="480">
+
+*First prototype of the measuring rig (v4, 23 Nov 2026): the arm holds the test pose; the webcam (nearest tower) watches the gripper from the side, the small board camera (right tower) looks along it.*
 
 **Timeline.** The project is split into gates. Each gate ends in a result that can be shown, so the project is complete up to whichever gate it reaches.
 
